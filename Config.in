@@ -1,0 +1,20 @@
+################################################################################
+# SPDX-License-Identifier: LGPL-3.0-only
+#
+# This file is part of hed.
+################################################################################
+
+config HED_ASSERT_API
+	bool "API assertion"
+	default n
+	help
+	  Build hed library with high-level API assertions enabled to ensure
+	  that API functions exposed by Utils will perform full verification of
+	  arguments consistency.
+
+config HED_ASSERT_INTERN
+	bool "Internal assertion"
+	select HED_ASSERT_API
+	default n
+	help
+	  Build hed library with internal assertions enabled.
