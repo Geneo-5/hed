@@ -40,7 +40,7 @@
 # endif
 # ifndef __hed_nonull
 #  define __hed_nonull(_arg_index, ...) \
-           __nonull(_arg_index, 
+           __nonull(_arg_index, ## __VA_ARGS__)
 # endif
 #endif
 
