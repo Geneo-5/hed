@@ -18,3 +18,32 @@ config HED_ASSERT_INTERN
 	default n
 	help
 	  Build hed library with internal assertions enabled.
+
+config BASE_ASSERT
+	bool
+	default HED_ASSERT_API
+
+config INET_ASSERT
+	bool
+	default HED_ASSERT_API
+
+menuconfig HED_TROER
+	bool "Build hed-troer library"
+	default y
+	help
+	  Build hed serialisable library usable with troer.
+
+config HED_TROER_BASE
+	bool "Base library"
+	default y
+	depends on HED_TROER
+	help
+	  Build hed serialisable library usable with troer.
+
+config HED_TROER_INET
+	bool "Inet library"
+	default y
+	depends on HED_TROER
+	help
+	  Build hed serialisable library usable with troer.
+

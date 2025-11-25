@@ -1,0 +1,41 @@
+schema: lib
+name: inet
+version: 0.0.1
+doc: inet structure
+prefix: hed_
+
+headers:
+  - <hed/priv/config.h>
+
+definitions:
+  -
+    name: ether_addr
+    type: ref
+    header: <hed/priv/inet.h>
+    struct: struct ether_addr
+    min: DPACK_BIN_SIZE(ETH_ALEN)
+    max: DPACK_BIN_SIZE(ETH_ALEN)
+    encode: hed_encode_ether_addr
+    decode: hed_decode_ether_addr
+    check: hed_check_ether_addr
+  -
+    name: in_addr
+    type: ref
+    header: <hed/priv/inet.h>
+    struct: struct in_addr
+    min: DPACK_UINT_SIZE_MIN
+    max: DPACK_UINT_SIZE_MAX
+    encode: hed_encode_in_addr
+    decode: hed_decode_in_addr
+    check: hed_check_in_addr
+  -
+    name: in6_addr
+    type: ref
+    header: <hed/priv/inet.h>
+    struct: struct in6_addr
+    min: DPACK_BIN_SIZE(16)
+    max: DPACK_BIN_SIZE(16)
+    encode: hed_encode_in6_addr
+    decode: hed_decode_in6_addr
+    check: hed_check_in6_addr
+

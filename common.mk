@@ -47,6 +47,6 @@ ifneq ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 common-ldflags        := $(filter-out -DNDEBUG,$(common-ldflags))
 endif # ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 
-common-pkgconf        := libutils libstroll libglav libdpack
+common-pkgconf        := libutils libstroll libdpack $(call kconf_enabled,HED_TROER,json-c)
 
 # ex: filetype=make :

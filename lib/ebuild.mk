@@ -6,16 +6,18 @@
 
 include ../common.mk
 
-libhed-objects  := codec.o
+#libhed-objects  := codec.o
+libhed-objects  += $(call kconf_enabled,HED_TROER_BASE,base.o)
+libhed-objects  += $(call kconf_enabled,HED_TROER_INET,inet.o inet-impl.o)
 
-solibs          := libhed.so
-libhed-objs     := $(addprefix shared/,$(libhed-objects))
-libhed-cflags   := $(shared-common-cflags)
-libhed-ldflags  := $(shared-common-ldflags)
-libhed-pkgconf  := $(common-pkgconf)
+solibs             := libhed.so
+libhed.so-objs     := $(addprefix shared/,$(libhed-objects))
+libhed.so-cflags   := $(shared-common-cflags)
+libhed.so-ldflags  := $(shared-common-ldflags)
+libhed.so-pkgconf  := $(common-pkgconf)
 
-arlibs          := libhed.a
-libhed.a-objs   := $(addprefix static/,$(libhed-objects))
-libhed.a-cflags := $(common-cflags)
+arlibs             := libhed.a
+libhed.a-objs      := $(addprefix static/,$(libhed-objects))
+libhed.a-cflags    := $(common-cflags)
 
 # ex: filetype=make :

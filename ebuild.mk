@@ -10,6 +10,12 @@ config-obj      := config.o
 
 HEADERDIR       := $(CURDIR)/include
 headers         := hed/cdefs.h
+headers         += hed/codec.h
+headers         += $(call kconf_enabled,HED_TROER_BASE,hed/base.h)
+headers         += $(call kconf_enabled,HED_TROER_BASE,hed/base.yml)
+headers         += $(call kconf_enabled,HED_TROER_INET,hed/priv/inet.h)
+headers         += $(call kconf_enabled,HED_TROER_INET,hed/inet.h)
+headers         += $(call kconf_enabled,HED_TROER_INET,hed/inet.yml)
 
 subdirs         := lib
 
@@ -22,14 +28,14 @@ includedir=$${prefix}/include
 Name: libhed
 Description: Hed library
 Version: $(VERSION)
-Requires: libutils libstroll libgalv libdpack
-Requires.private: libutils libstroll libgalv libdpack
+Requires: libutils libstroll libgalv libdpack $(call kconf_enabled,HED_TROER,json-c)
+Requires.private: libutils libstroll libgalv libdpack $(call kconf_enabled,HED_TROER,json-c)
 Cflags: -I$${includedir}
 Libs: -L$${libdir} -Wl,--push-state,--as-needed -lhed -Wl,--pop-state
 endef
 
-pkgconfigs      := libgalv.pc
-libgalv.pc-tmpl := libgalv_pkgconf_tmpl
+pkgconfigs      := libhed.pc
+libhed.pc-tmpl  := libhed_pkgconf_tmpl
 
 ################################################################################
 # Source code tags generation
