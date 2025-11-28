@@ -132,9 +132,9 @@ hed_decode_name(struct dpack_decoder * decoder,
  * - dpack_encode_lvstr()
  * - dpack_encoder_init_buffer()
  */
-static inline int __hed_nonull(1) __nothrow __warn_result 
+static inline int __hed_nonull(1, 2) __nothrow __warn_result 
 hed_encode_name(struct dpack_encoder * encoder,
-	  struct stroll_lvstr * value)
+	  const struct stroll_lvstr * value)
 {
 	hed_assert(encoder);
 	hed_assert(hed_check_name(value) == 0);

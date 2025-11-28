@@ -7,7 +7,7 @@ prefix: hed_
 headers:
   - <hed/priv/config.h>
 
-structures:
+declarations:
   -
     name: name
     type: str

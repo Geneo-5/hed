@@ -10,11 +10,17 @@
 
 
 #include <dpack/codec.h>
+#include <dpack/scalar.h>
 #include <errno.h>
 #include <hed/priv/config.h>
-#include <hed/priv/inet.h>
 #include <json-c/json_object.h>
+#include <netinet/ether.h>
+#include <netinet/in.h>
+#include <stdint.h>
+#include <string.h>
+#include <stroll/array.h>
 #include <stroll/cdefs.h>
+#include <sys/socket.h>
 
 /**
  * Assert if condition is not
@@ -54,6 +60,137 @@
  */
 #define HED_ETHER_ADDR_PACKED_SIZE_MAX (DPACK_BIN_SIZE(ETH_ALEN))
 
+/**
+ * Check if input is valid struct ether_addr
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_ether_addr(const struct ether_addr * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct ether_addr encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - ()
+ */
+extern int
+hed_decode_ether_addr(struct dpack_decoder * decoder,
+	  struct ether_addr * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct ether_addr according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_ether_addr value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - ()
+ */
+extern int
+hed_encode_ether_addr(struct dpack_encoder * encoder,
+	  const struct ether_addr * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct ether_addr encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_ether_addr_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct ether_addr according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_ether_addr_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
 
 /**
  * Minimum size in bytes of an struct in_addr serialized according to
@@ -67,6 +204,137 @@
  */
 #define HED_IN_ADDR_PACKED_SIZE_MAX (DPACK_UINT_SIZE_MAX)
 
+/**
+ * Check if input is valid struct in_addr
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_in_addr(const struct in_addr * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct in_addr encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - ()
+ */
+extern int
+hed_decode_in_addr(struct dpack_decoder * decoder,
+	  struct in_addr * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct in_addr according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in_addr value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - ()
+ */
+extern int
+hed_encode_in_addr(struct dpack_encoder * encoder,
+	  const struct in_addr * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct in_addr encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_in_addr_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct in_addr according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in_addr_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
 
 /**
  * Minimum size in bytes of an struct in6_addr serialized according to
@@ -79,6 +347,1727 @@
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN6_ADDR_PACKED_SIZE_MAX (DPACK_BIN_SIZE(16))
+
+/**
+ * Check if input is valid struct in6_addr
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_in6_addr(const struct in6_addr * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct in6_addr encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - ()
+ */
+extern int
+hed_decode_in6_addr(struct dpack_decoder * decoder,
+	  struct in6_addr * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct in6_addr according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in6_addr value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - ()
+ */
+extern int
+hed_encode_in6_addr(struct dpack_encoder * encoder,
+	  const struct in6_addr * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct in6_addr encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_in6_addr_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct in6_addr according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in6_addr_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Minimum size in bytes of an enum hed_ip_type serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IP_TYPE_PACKED_SIZE_MIN DPACK_INT_SIZE_MIN
+
+/**
+ * Maximum size in bytes of an enum hed_ip_type serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IP_TYPE_PACKED_SIZE_MAX DPACK_INT_SIZE_MAX
+
+/**
+ * Number of elements in the enum hed_ip_type
+ */
+#define HED_IP_TYPE_NB 2
+
+/**
+ * @enum hed_ip_type
+ * 
+ **/
+enum hed_ip_type {
+		HED_IPV4 = AF_INET,
+		HED_IPV6 = AF_INET6,
+};
+
+/**
+ * Convert enum hed_ip_type to string format
+ *
+ * @param[in] value The value to convert
+ *
+ * @return a const string
+ * @return NULL Invalid value
+ */
+extern const char *
+hed_ip_type_to_str(enum hed_ip_type value)
+__warn_result ;
+
+/**
+ * Search a string format of enum hed_ip_type
+ *
+ * @param[in]  str   The string to research
+ * @param[out] value The value founding
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_ip_type_from_str(const char *str, enum hed_ip_type *value)
+ __hed_nonull(1, 2) __warn_result ;
+
+/**
+ * Copy to array all pointer constant string of enum hed_ip_type
+ *
+ * @param[in] buf The buffer to copy
+ * @param[in] nr  The buffer size
+ *
+ * @return number of elements added
+ *
+ * @warning
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p nr is lower than #HED_IP_TYPE_NB value, the
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see HED_IP_TYPE_NB
+ */
+extern int
+hed_ip_type_dump_str(const char ** buf, size_t nr)
+ __hed_nonull(1) ;
+
+/**
+ * Check if input is valid enum hed_ip_type
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+static inline int __warn_result 
+hed_check_ip_type(enum hed_ip_type value)
+{
+	if (hed_ip_type_to_str(value) == NULL)
+		return -EINVAL;
+
+	return 0;
+};
+
+/**
+ * Decode a enum hed_ip_type encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @sa
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+static inline int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_ip_type(struct dpack_decoder * decoder,
+	  enum hed_ip_type * __restrict value)
+{
+	return dpack_decode_int(decoder, (int *)value);
+};
+
+/**
+ * Encode an enum hed_ip_type according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value   enum hed_ip_type value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ */
+static inline int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_ip_type(struct dpack_encoder * encoder,
+	  enum hed_ip_type value)
+{
+	return dpack_encode_int(encoder, (int)value);
+};
+
+/**
+ * Decode a int encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+extern struct json_object *
+hed_decode_ip_type_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json string according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object  json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_ip_type_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+
+/**
+ * Minimum size in bytes of an uint8_t serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN_PFX_PACKED_SIZE_MIN DPACK_UINT8_SIZE_MIN
+
+/**
+ * Maximum size in bytes of an uint8_t serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN_PFX_PACKED_SIZE_MAX DPACK_UINT8_SIZE_MAX
+
+/**
+ * Check if input is valid uint8_t
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+static inline int 
+hed_check_in_pfx(const uint8_t value __unused)
+{
+	if (value >= 32)
+		return -EINVAL;
+	return 0;
+};
+
+/**
+ * Decode a uint8_t encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+static inline int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_in_pfx(struct dpack_decoder * decoder,
+	  uint8_t * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = dpack_decode_uint8(decoder, value);
+	if (ret)
+		return ret;
+
+	return hed_check_in_pfx(*value);
+};
+
+/**
+ * Encode an uint8_t according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in_pfx value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_uint8()
+ * - dpack_encoder_init_buffer()
+ */
+static inline int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_in_pfx(struct dpack_encoder * encoder,
+	  uint8_t value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_in_pfx(value) == 0);
+
+	return dpack_encode_uint8(encoder, value);
+};
+
+/**
+ * Decode a uint8_t encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+extern struct json_object *
+hed_decode_in_pfx_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json uint8_t according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object  json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_uint8()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in_pfx_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+
+/**
+ * Minimum size in bytes of an uint8_t serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN6_PFX_PACKED_SIZE_MIN DPACK_UINT8_SIZE_MIN
+
+/**
+ * Maximum size in bytes of an uint8_t serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN6_PFX_PACKED_SIZE_MAX DPACK_UINT8_SIZE_MAX
+
+/**
+ * Check if input is valid uint8_t
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+static inline int 
+hed_check_in6_pfx(const uint8_t value __unused)
+{
+	if (value >= 128)
+		return -EINVAL;
+	return 0;
+};
+
+/**
+ * Decode a uint8_t encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+static inline int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_in6_pfx(struct dpack_decoder * decoder,
+	  uint8_t * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = dpack_decode_uint8(decoder, value);
+	if (ret)
+		return ret;
+
+	return hed_check_in6_pfx(*value);
+};
+
+/**
+ * Encode an uint8_t according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in6_pfx value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_uint8()
+ * - dpack_encoder_init_buffer()
+ */
+static inline int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_in6_pfx(struct dpack_encoder * encoder,
+	  uint8_t value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_in6_pfx(value) == 0);
+
+	return dpack_encode_uint8(encoder, value);
+};
+
+/**
+ * Decode a uint8_t encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+extern struct json_object *
+hed_decode_in6_pfx_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json uint8_t according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object  json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_uint8()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in6_pfx_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+
+/**
+ * Minimum size in bytes of an uint16_t serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_PORT_PACKED_SIZE_MIN DPACK_UINT16_SIZE_MIN
+
+/**
+ * Maximum size in bytes of an uint16_t serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_PORT_PACKED_SIZE_MAX DPACK_UINT16_SIZE_MAX
+
+/**
+ * Check if input is valid uint16_t
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+static inline int 
+hed_check_port(const uint16_t value __unused)
+{
+	if (value < 1)
+		return -EINVAL;
+	return 0;
+};
+
+/**
+ * Decode a uint16_t encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+static inline int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_port(struct dpack_decoder * decoder,
+	  uint16_t * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = dpack_decode_uint16(decoder, value);
+	if (ret)
+		return ret;
+
+	return hed_check_port(*value);
+};
+
+/**
+ * Encode an uint16_t according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_port value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_uint16()
+ * - dpack_encoder_init_buffer()
+ */
+static inline int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_port(struct dpack_encoder * encoder,
+	  uint16_t value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_port(value) == 0);
+
+	return dpack_encode_uint16(encoder, value);
+};
+
+/**
+ * Decode a uint16_t encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+extern struct json_object *
+hed_decode_port_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json uint16_t according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object  json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_uint16()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_port_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+
+
+
+/**
+ * Minimum size in bytes of an struct hed_in_svc serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN_SVC_PACKED_SIZE_MIN \
+	HED_IN_ADDR_PACKED_SIZE_MIN + \
+	HED_PORT_PACKED_SIZE_MIN
+	
+/**
+ * Maximum size in bytes of an struct hed_in_svc serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN_SVC_PACKED_SIZE_MAX \
+	HED_IN_ADDR_PACKED_SIZE_MAX + \
+	HED_PORT_PACKED_SIZE_MAX
+
+struct hed_in_svc {
+	struct in_addr addr;
+	uint16_t port;
+};
+
+/**
+ * Check if input is valid struct hed_in_svc
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_in_svc(const struct hed_in_svc * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct hed_in_svc encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in_svc()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - hed_init_in_svc()
+ */
+extern int
+hed_decode_in_svc(struct dpack_decoder * decoder,
+	  struct hed_in_svc * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct hed_in_svc according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in_svc value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in_svc()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - hed_init_in_svc()
+ */
+extern int
+hed_encode_in_svc(struct dpack_encoder * encoder,
+	  const struct hed_in_svc * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct hed_in_svc encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_in_svc_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct hed_in_svc according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in_svc_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/*
+ * Initialize an empty struct hed_in_svc_.
+ * @param[out] value Length-Value String
+ *
+ * @return an arrno like error code
+ * @retval 0         Success
+ */
+extern int
+hed_init_in_svc(struct hed_in_svc * value)
+ __hed_nonull(1) __warn_result ;
+
+/*
+ * Finalize an empty struct hed_in_svc_.
+ * @param[inout] value Length-Value String
+ */
+extern void
+hed_fini_in_svc(struct hed_in_svc * value)
+ __hed_nonull(1) ;
+
+static inline struct in_addr* __hed_nonull(1) 
+hed_in_svc_get_addr(struct hed_in_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_svc(value) == 0);
+
+	return &value->addr;
+}
+
+static inline const struct in_addr* __hed_nonull(1) 
+hed_const_in_svc_get_addr(const struct hed_in_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_svc(value) == 0);
+
+	return &value->addr;
+}
+
+static inline uint16_t __hed_nonull(1) 
+hed_in_svc_get_port(struct hed_in_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_svc(value) == 0);
+
+	return value->port;
+}
+
+static inline uint16_t __hed_nonull(1) 
+hed_const_in_svc_get_port(const struct hed_in_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_svc(value) == 0);
+
+	return value->port;
+}
+
+static inline void __hed_nonull(1) 
+hed_in_svc_set_port(struct hed_in_svc * data, uint16_t value)
+{
+	hed_assert(data);
+	hed_assert(hed_check_port(value) == 0);
+
+	data->port = value;
+}
+
+
+
+
+/**
+ * Minimum size in bytes of an struct hed_in6_svc serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN6_SVC_PACKED_SIZE_MIN \
+	HED_IN6_ADDR_PACKED_SIZE_MIN + \
+	HED_PORT_PACKED_SIZE_MIN
+	
+/**
+ * Maximum size in bytes of an struct hed_in6_svc serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN6_SVC_PACKED_SIZE_MAX \
+	HED_IN6_ADDR_PACKED_SIZE_MAX + \
+	HED_PORT_PACKED_SIZE_MAX
+
+struct hed_in6_svc {
+	struct in6_addr addr;
+	uint16_t port;
+};
+
+/**
+ * Check if input is valid struct hed_in6_svc
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_in6_svc(const struct hed_in6_svc * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct hed_in6_svc encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in6_svc()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - hed_init_in6_svc()
+ */
+extern int
+hed_decode_in6_svc(struct dpack_decoder * decoder,
+	  struct hed_in6_svc * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct hed_in6_svc according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in6_svc value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in6_svc()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - hed_init_in6_svc()
+ */
+extern int
+hed_encode_in6_svc(struct dpack_encoder * encoder,
+	  const struct hed_in6_svc * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct hed_in6_svc encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_in6_svc_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct hed_in6_svc according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in6_svc_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/*
+ * Initialize an empty struct hed_in6_svc_.
+ * @param[out] value Length-Value String
+ *
+ * @return an arrno like error code
+ * @retval 0         Success
+ */
+extern int
+hed_init_in6_svc(struct hed_in6_svc * value)
+ __hed_nonull(1) __warn_result ;
+
+/*
+ * Finalize an empty struct hed_in6_svc_.
+ * @param[inout] value Length-Value String
+ */
+extern void
+hed_fini_in6_svc(struct hed_in6_svc * value)
+ __hed_nonull(1) ;
+
+static inline struct in6_addr* __hed_nonull(1) 
+hed_in6_svc_get_addr(struct hed_in6_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_svc(value) == 0);
+
+	return &value->addr;
+}
+
+static inline const struct in6_addr* __hed_nonull(1) 
+hed_const_in6_svc_get_addr(const struct hed_in6_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_svc(value) == 0);
+
+	return &value->addr;
+}
+
+static inline uint16_t __hed_nonull(1) 
+hed_in6_svc_get_port(struct hed_in6_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_svc(value) == 0);
+
+	return value->port;
+}
+
+static inline uint16_t __hed_nonull(1) 
+hed_const_in6_svc_get_port(const struct hed_in6_svc * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_svc(value) == 0);
+
+	return value->port;
+}
+
+static inline void __hed_nonull(1) 
+hed_in6_svc_set_port(struct hed_in6_svc * data, uint16_t value)
+{
+	hed_assert(data);
+	hed_assert(hed_check_port(value) == 0);
+
+	data->port = value;
+}
+
+
+
+
+/**
+ * Minimum size in bytes of an struct hed_in_net serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN_NET_PACKED_SIZE_MIN \
+	HED_IN_ADDR_PACKED_SIZE_MIN + \
+	HED_IN_PFX_PACKED_SIZE_MIN
+	
+/**
+ * Maximum size in bytes of an struct hed_in_net serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN_NET_PACKED_SIZE_MAX \
+	HED_IN_ADDR_PACKED_SIZE_MAX + \
+	HED_IN_PFX_PACKED_SIZE_MAX
+
+struct hed_in_net {
+	struct in_addr addr;
+	uint8_t prefix;
+};
+
+/**
+ * Applicative check if input is valid struct hed_in_net
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_in_net_check_addr_prefix(const struct hed_in_net * value)
+__hed_nonull(1) __warn_result;
+
+/**
+ * Check if input is valid struct hed_in_net
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_in_net(const struct hed_in_net * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct hed_in_net encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in_net()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - hed_init_in_net()
+ */
+extern int
+hed_decode_in_net(struct dpack_decoder * decoder,
+	  struct hed_in_net * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct hed_in_net according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in_net value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in_net()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - hed_init_in_net()
+ */
+extern int
+hed_encode_in_net(struct dpack_encoder * encoder,
+	  const struct hed_in_net * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct hed_in_net encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_in_net_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct hed_in_net according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in_net_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/*
+ * Initialize an empty struct hed_in_net_.
+ * @param[out] value Length-Value String
+ *
+ * @return an arrno like error code
+ * @retval 0         Success
+ */
+extern int
+hed_init_in_net(struct hed_in_net * value)
+ __hed_nonull(1) __warn_result ;
+
+/*
+ * Finalize an empty struct hed_in_net_.
+ * @param[inout] value Length-Value String
+ */
+extern void
+hed_fini_in_net(struct hed_in_net * value)
+ __hed_nonull(1) ;
+
+static inline struct in_addr* __hed_nonull(1) 
+hed_in_net_get_addr(struct hed_in_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_net(value) == 0);
+
+	return &value->addr;
+}
+
+static inline const struct in_addr* __hed_nonull(1) 
+hed_const_in_net_get_addr(const struct hed_in_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_net(value) == 0);
+
+	return &value->addr;
+}
+
+static inline uint8_t __hed_nonull(1) 
+hed_in_net_get_prefix(struct hed_in_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_net(value) == 0);
+
+	return value->prefix;
+}
+
+static inline uint8_t __hed_nonull(1) 
+hed_const_in_net_get_prefix(const struct hed_in_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in_net(value) == 0);
+
+	return value->prefix;
+}
+
+static inline void __hed_nonull(1) 
+hed_in_net_set_prefix(struct hed_in_net * data, uint8_t value)
+{
+	hed_assert(data);
+	hed_assert(hed_check_in_pfx(value) == 0);
+
+	data->prefix = value;
+}
+
+
+
+
+/**
+ * Minimum size in bytes of an struct hed_in6_net serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN6_NET_PACKED_SIZE_MIN \
+	HED_IN6_ADDR_PACKED_SIZE_MIN + \
+	HED_IN6_PFX_PACKED_SIZE_MIN
+	
+/**
+ * Maximum size in bytes of an struct hed_in6_net serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_IN6_NET_PACKED_SIZE_MAX \
+	HED_IN6_ADDR_PACKED_SIZE_MAX + \
+	HED_IN6_PFX_PACKED_SIZE_MAX
+
+struct hed_in6_net {
+	struct in6_addr addr;
+	uint8_t prefix;
+};
+
+/**
+ * Applicative check if input is valid struct hed_in6_net
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_in6_net_check_addr_prefix(const struct hed_in6_net * value)
+__hed_nonull(1) __warn_result;
+
+/**
+ * Check if input is valid struct hed_in6_net
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_in6_net(const struct hed_in6_net * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct hed_in6_net encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in6_net()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - hed_init_in6_net()
+ */
+extern int
+hed_decode_in6_net(struct dpack_decoder * decoder,
+	  struct hed_in6_net * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct hed_in6_net according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_in6_net value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using hed_init_in6_net()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - hed_init_in6_net()
+ */
+extern int
+hed_encode_in6_net(struct dpack_encoder * encoder,
+	  const struct hed_in6_net * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct hed_in6_net encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_in6_net_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct hed_in6_net according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_INET_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_in6_net_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/*
+ * Initialize an empty struct hed_in6_net_.
+ * @param[out] value Length-Value String
+ *
+ * @return an arrno like error code
+ * @retval 0         Success
+ */
+extern int
+hed_init_in6_net(struct hed_in6_net * value)
+ __hed_nonull(1) __warn_result ;
+
+/*
+ * Finalize an empty struct hed_in6_net_.
+ * @param[inout] value Length-Value String
+ */
+extern void
+hed_fini_in6_net(struct hed_in6_net * value)
+ __hed_nonull(1) ;
+
+static inline struct in6_addr* __hed_nonull(1) 
+hed_in6_net_get_addr(struct hed_in6_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_net(value) == 0);
+
+	return &value->addr;
+}
+
+static inline const struct in6_addr* __hed_nonull(1) 
+hed_const_in6_net_get_addr(const struct hed_in6_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_net(value) == 0);
+
+	return &value->addr;
+}
+
+static inline uint8_t __hed_nonull(1) 
+hed_in6_net_get_prefix(struct hed_in6_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_net(value) == 0);
+
+	return value->prefix;
+}
+
+static inline uint8_t __hed_nonull(1) 
+hed_const_in6_net_get_prefix(const struct hed_in6_net * value)
+{
+	hed_assert(value);
+	hed_assert(hed_check_in6_net(value) == 0);
+
+	return value->prefix;
+}
+
+static inline void __hed_nonull(1) 
+hed_in6_net_set_prefix(struct hed_in6_net * data, uint8_t value)
+{
+	hed_assert(data);
+	hed_assert(hed_check_in6_pfx(value) == 0);
+
+	data->prefix = value;
+}
 
 
 #endif /* _INET_H */

@@ -6,12 +6,13 @@ prefix: hed_
 
 headers:
   - <hed/priv/config.h>
+  - <sys/socket.h>
 
-definitions:
+declarations:
   -
     name: ether_addr
-    type: ref
-    header: <hed/priv/inet.h>
+    type: custom
+    header: <netinet/ether.h>
     struct: struct ether_addr
     min: DPACK_BIN_SIZE(ETH_ALEN)
     max: DPACK_BIN_SIZE(ETH_ALEN)
@@ -20,8 +21,8 @@ definitions:
     check: hed_check_ether_addr
   -
     name: in_addr
-    type: ref
-    header: <hed/priv/inet.h>
+    type: custom
+    header: <netinet/in.h>
     struct: struct in_addr
     min: DPACK_UINT_SIZE_MIN
     max: DPACK_UINT_SIZE_MAX
@@ -30,12 +31,75 @@ definitions:
     check: hed_check_in_addr
   -
     name: in6_addr
-    type: ref
-    header: <hed/priv/inet.h>
+    type: custom
+    header: <netinet/in.h>
     struct: struct in6_addr
     min: DPACK_BIN_SIZE(16)
     max: DPACK_BIN_SIZE(16)
     encode: hed_encode_in6_addr
     decode: hed_decode_in6_addr
     check: hed_check_in6_addr
-
+  -
+    name: ip_type
+    type: enum
+    entries:
+      -
+        name: IPv4
+        value: AF_INET
+      -
+        name: IPv6
+        value: AF_INET6
+  -
+    name: in_pfx
+    type: u8
+    max: 32
+  -
+    name: in6_pfx
+    type: u8
+    max: 128
+  -
+    name: port
+    type: u16
+    min: 1
+  -
+    name: in_svc
+    type: struct
+    entries:
+      -
+        name: addr
+        type: $in_addr
+      -
+        name: port
+        type: $port
+  -
+    name: in6_svc
+    type: struct
+    entries:
+      -
+        name: addr
+        type: $in6_addr
+      -
+        name: port
+        type: $port
+  -
+    name: in_net
+    type: struct
+    check: hed_in_net_check_addr_prefix
+    entries:
+      -
+        name: addr
+        type: $in_addr
+      -
+        name: prefix
+        type: $in_pfx
+  -
+    name: in6_net
+    type: struct
+    check: hed_in6_net_check_addr_prefix
+    entries:
+      -
+        name: addr
+        type: $in6_addr
+      -
+        name: prefix
+        type: $in6_pfx

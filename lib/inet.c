@@ -10,3 +10,810 @@
 
 
 
+struct hed_ip_type_bisect_entry {
+	const char * str;
+	enum hed_ip_type value;
+};
+
+static const struct hed_ip_type_bisect_entry hed_ip_type_bisect_array[] = {
+	{"IPv4", HED_IPV4},
+	{"IPv6", HED_IPV6},
+};
+
+extern const char * __warn_result 
+hed_ip_type_to_str(enum hed_ip_type value)
+{
+	unsigned long i;
+
+	for (i = 0; i < stroll_array_nr(hed_ip_type_bisect_array); i++) {
+		if (hed_ip_type_bisect_array[i].value == value)
+			return hed_ip_type_bisect_array[i].str;
+	}
+	return NULL;
+}
+
+static int __hed_nonull(1, 2)
+hed_ip_type_bisect_cmp(const void * __restrict key,
+		  const void * __restrict entry,
+		  void *                  data __unused)
+{
+	hed_assert(key);
+	hed_assert(entry);
+
+	const char * k = key;
+	const char * e = ((const struct hed_ip_type_bisect_entry *)entry)->str;
+	return strcmp(k, e);
+}
+
+extern int __hed_nonull(1, 2) __warn_result 
+hed_ip_type_from_str(const char *str, enum hed_ip_type *value)
+{
+	hed_assert(str);
+	hed_assert(value);
+
+	const struct hed_ip_type_bisect_entry *entry;
+
+	entry = stroll_array_bisect_search(str,
+					   hed_ip_type_bisect_array,
+					   stroll_array_nr(hed_ip_type_bisect_array),
+					   sizeof(hed_ip_type_bisect_array[0]),
+					   hed_ip_type_bisect_cmp,
+					   NULL);
+	if (!entry)
+		return -EINVAL;
+
+	*value = entry->value;
+	return 0;
+}
+
+extern int __hed_nonull(1) 
+hed_ip_type_dump_str(const char ** buf, size_t nr __unused)
+{
+	hed_assert(buf);
+	hed_assert(nr >= HED_IP_TYPE_NB);
+
+	unsigned long i;
+
+	for (i = 0; i < stroll_array_nr(hed_ip_type_bisect_array); i++) {
+		buf[i] = hed_ip_type_bisect_array[i].str;
+	}
+	return HED_IP_TYPE_NB;
+}
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_ip_type_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	enum hed_ip_type value;
+	const char *str;
+
+	ret = dpack_decode_int(decoder, (int *)&value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	str = hed_ip_type_to_str(value);
+	if (!str) {
+		errno = EINVAL;
+		return NULL;
+	}
+	return json_object_new_string(str);
+};
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_ip_type_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	const char * str;
+	enum hed_ip_type value;
+
+	errno = 0;
+	str = json_object_get_string(object);
+	if (errno)
+		return -errno;
+
+	ret = hed_ip_type_from_str(str, &value);
+	if (ret)
+		return ret;
+
+	return dpack_encode_int(encoder, (int)value);
+};
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_in_pfx_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	uint8_t value;
+
+	ret = dpack_decode_uint8(decoder, &value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	ret = hed_check_in_pfx(value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	return json_object_new_int(value);
+};
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_in_pfx_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	uint8_t value;
+
+	errno = 0;
+	value = (uint8_t)json_object_get_int(object);
+	if (errno)
+		return -errno;
+
+	ret = hed_check_in_pfx(value);
+	if (ret)
+		return ret;
+
+	return dpack_encode_uint8(encoder, value);
+};
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_in6_pfx_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	uint8_t value;
+
+	ret = dpack_decode_uint8(decoder, &value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	ret = hed_check_in6_pfx(value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	return json_object_new_int(value);
+};
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_in6_pfx_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	uint8_t value;
+
+	errno = 0;
+	value = (uint8_t)json_object_get_int(object);
+	if (errno)
+		return -errno;
+
+	ret = hed_check_in6_pfx(value);
+	if (ret)
+		return ret;
+
+	return dpack_encode_uint8(encoder, value);
+};
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_port_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	uint16_t value;
+
+	ret = dpack_decode_uint16(decoder, &value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	ret = hed_check_port(value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	return json_object_new_int(value);
+};
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_port_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	uint16_t value;
+
+	errno = 0;
+	value = (uint16_t)json_object_get_int(object);
+	if (errno)
+		return -errno;
+
+	ret = hed_check_port(value);
+	if (ret)
+		return ret;
+
+	return dpack_encode_uint16(encoder, value);
+};
+
+
+
+extern int __hed_nonull(1) __warn_result 
+hed_check_in_svc(const struct hed_in_svc * value)
+{
+	hed_assert(value);
+
+	if (hed_check_in_addr(&value->addr))
+		return 1;
+
+	if (hed_check_port(value->port))
+		return 1;
+
+	return 0;
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_in_svc(struct dpack_decoder * decoder,
+	  struct hed_in_svc * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = hed_decode_in_addr(decoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_decode_port(decoder, &value->port);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_in_svc(struct dpack_encoder * encoder,
+	  const struct hed_in_svc * value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_in_svc(value) == 0);
+
+	int ret;
+
+	ret = hed_encode_in_addr(encoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_encode_port(encoder, value->port);
+	if (ret)
+		return ret;
+
+
+	return 0;
+}
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_in_svc_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	struct json_object *object;
+	struct json_object *obj;
+
+	object = json_object_new_object();
+	if (!object)
+		return NULL;
+
+	obj = hed_decode_in_addr_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "addr", obj);
+	if (ret)
+		goto error;
+
+	obj = hed_decode_port_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "port", obj);
+	if (ret)
+		goto error;
+
+	return object;
+error:
+	json_object_put(object);
+	return NULL;
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_in_svc_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	struct json_object *obj;
+
+	obj = json_object_object_get(object, "addr");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_in_addr_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	obj = json_object_object_get(object, "port");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_port_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __warn_result 
+hed_init_in_svc(struct hed_in_svc * value __unused)
+{
+	hed_assert(value);
+
+	int ret = 0;
+
+	return ret;
+}
+
+extern void __hed_nonull(1) 
+hed_fini_in_svc(struct hed_in_svc * value __unused)
+{
+	hed_assert(value);
+
+}
+
+
+
+
+extern int __hed_nonull(1) __warn_result 
+hed_check_in6_svc(const struct hed_in6_svc * value)
+{
+	hed_assert(value);
+
+	if (hed_check_in6_addr(&value->addr))
+		return 1;
+
+	if (hed_check_port(value->port))
+		return 1;
+
+	return 0;
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_in6_svc(struct dpack_decoder * decoder,
+	  struct hed_in6_svc * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = hed_decode_in6_addr(decoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_decode_port(decoder, &value->port);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_in6_svc(struct dpack_encoder * encoder,
+	  const struct hed_in6_svc * value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_in6_svc(value) == 0);
+
+	int ret;
+
+	ret = hed_encode_in6_addr(encoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_encode_port(encoder, value->port);
+	if (ret)
+		return ret;
+
+
+	return 0;
+}
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_in6_svc_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	struct json_object *object;
+	struct json_object *obj;
+
+	object = json_object_new_object();
+	if (!object)
+		return NULL;
+
+	obj = hed_decode_in6_addr_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "addr", obj);
+	if (ret)
+		goto error;
+
+	obj = hed_decode_port_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "port", obj);
+	if (ret)
+		goto error;
+
+	return object;
+error:
+	json_object_put(object);
+	return NULL;
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_in6_svc_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	struct json_object *obj;
+
+	obj = json_object_object_get(object, "addr");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_in6_addr_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	obj = json_object_object_get(object, "port");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_port_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __warn_result 
+hed_init_in6_svc(struct hed_in6_svc * value __unused)
+{
+	hed_assert(value);
+
+	int ret = 0;
+
+	return ret;
+}
+
+extern void __hed_nonull(1) 
+hed_fini_in6_svc(struct hed_in6_svc * value __unused)
+{
+	hed_assert(value);
+
+}
+
+
+
+
+extern int __hed_nonull(1) __warn_result 
+hed_check_in_net(const struct hed_in_net * value)
+{
+	hed_assert(value);
+
+	if (hed_check_in_addr(&value->addr))
+		return 1;
+
+	if (hed_check_in_pfx(value->prefix))
+		return 1;
+
+	return hed_in_net_check_addr_prefix(value);
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_in_net(struct dpack_decoder * decoder,
+	  struct hed_in_net * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = hed_decode_in_addr(decoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_decode_in_pfx(decoder, &value->prefix);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_in_net(struct dpack_encoder * encoder,
+	  const struct hed_in_net * value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_in_net(value) == 0);
+
+	int ret;
+
+	ret = hed_encode_in_addr(encoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_encode_in_pfx(encoder, value->prefix);
+	if (ret)
+		return ret;
+
+
+	return 0;
+}
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_in_net_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	struct json_object *object;
+	struct json_object *obj;
+
+	object = json_object_new_object();
+	if (!object)
+		return NULL;
+
+	obj = hed_decode_in_addr_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "addr", obj);
+	if (ret)
+		goto error;
+
+	obj = hed_decode_in_pfx_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "prefix", obj);
+	if (ret)
+		goto error;
+
+	return object;
+error:
+	json_object_put(object);
+	return NULL;
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_in_net_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	struct json_object *obj;
+
+	obj = json_object_object_get(object, "addr");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_in_addr_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	obj = json_object_object_get(object, "prefix");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_in_pfx_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __warn_result 
+hed_init_in_net(struct hed_in_net * value __unused)
+{
+	hed_assert(value);
+
+	int ret = 0;
+
+	return ret;
+}
+
+extern void __hed_nonull(1) 
+hed_fini_in_net(struct hed_in_net * value __unused)
+{
+	hed_assert(value);
+
+}
+
+
+
+
+extern int __hed_nonull(1) __warn_result 
+hed_check_in6_net(const struct hed_in6_net * value)
+{
+	hed_assert(value);
+
+	if (hed_check_in6_addr(&value->addr))
+		return 1;
+
+	if (hed_check_in6_pfx(value->prefix))
+		return 1;
+
+	return hed_in6_net_check_addr_prefix(value);
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_decode_in6_net(struct dpack_decoder * decoder,
+	  struct hed_in6_net * __restrict value)
+{
+	hed_assert(decoder);
+	hed_assert(value);
+
+	int ret;
+
+	ret = hed_decode_in6_addr(decoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_decode_in6_pfx(decoder, &value->prefix);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __nothrow __warn_result 
+hed_encode_in6_net(struct dpack_encoder * encoder,
+	  const struct hed_in6_net * value)
+{
+	hed_assert(encoder);
+	hed_assert(hed_check_in6_net(value) == 0);
+
+	int ret;
+
+	ret = hed_encode_in6_addr(encoder, &value->addr);
+	if (ret)
+		return ret;
+
+	ret = hed_encode_in6_pfx(encoder, value->prefix);
+	if (ret)
+		return ret;
+
+
+	return 0;
+}
+
+extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
+hed_decode_in6_net_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	struct json_object *object;
+	struct json_object *obj;
+
+	object = json_object_new_object();
+	if (!object)
+		return NULL;
+
+	obj = hed_decode_in6_addr_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "addr", obj);
+	if (ret)
+		goto error;
+
+	obj = hed_decode_in6_pfx_to_json(decoder);
+	if (!obj)
+		goto error;
+
+	ret = json_object_object_add(object, "prefix", obj);
+	if (ret)
+		goto error;
+
+	return object;
+error:
+	json_object_put(object);
+	return NULL;
+}
+
+extern int __hed_nonull(1, 2) __nothrow __warn_result 
+hed_encode_in6_net_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	struct json_object *obj;
+
+	obj = json_object_object_get(object, "addr");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_in6_addr_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	obj = json_object_object_get(object, "prefix");
+	if (!obj)
+		return -EINVAL;
+
+	ret = hed_encode_in6_pfx_from_json(encoder, obj);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+extern int __hed_nonull(1) __warn_result 
+hed_init_in6_net(struct hed_in6_net * value __unused)
+{
+	hed_assert(value);
+
+	int ret = 0;
+
+	return ret;
+}
+
+extern void __hed_nonull(1) 
+hed_fini_in6_net(struct hed_in6_net * value __unused)
+{
+	hed_assert(value);
+
+}
+
+

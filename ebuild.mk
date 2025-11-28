@@ -13,7 +13,6 @@ headers         := hed/cdefs.h
 headers         += hed/codec.h
 headers         += $(call kconf_enabled,HED_TROER_BASE,hed/base.h)
 headers         += $(call kconf_enabled,HED_TROER_BASE,hed/base.yml)
-headers         += $(call kconf_enabled,HED_TROER_INET,hed/priv/inet.h)
 headers         += $(call kconf_enabled,HED_TROER_INET,hed/inet.h)
 headers         += $(call kconf_enabled,HED_TROER_INET,hed/inet.yml)
 

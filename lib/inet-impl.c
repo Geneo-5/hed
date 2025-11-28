@@ -4,9 +4,46 @@
  * This file is part of hed.
  ******************************************************************************/
 
-#include <hed/priv/inet.h>
+#include <hed/cdefs.h>
+#include <hed/inet.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <dpack/codec.h>
+#include <json-c/json_object.h>
+#include <dpack/bin.h>
+#include <dpack/scalar.h>
+
+int
+hed_check_ether_addr(const struct ether_addr *addr __unused)
+{
+	hed_assert_api(addr);
+
+	return 0;
+}
+
+int
+hed_encode_ether_addr(struct dpack_encoder    * encoder,
+                      const struct ether_addr * addr)
+{
+	hed_assert_api(encoder);
+	hed_assert_api(addr);
+
+	return dpack_encode_bin(encoder,
+	                        (const char *)addr->ether_addr_octet,
+	                        ETH_ALEN);
+}
+
+int
+hed_decode_ether_addr(struct dpack_decoder * decoder,
+                      struct ether_addr    * addr)
+{
+	hed_assert_api(decoder);
+	hed_assert_api(addr);
+
+	return dpack_decode_bincpy_equ(decoder,
+	                               ETH_ALEN,
+	                               (char *)addr->ether_addr_octet);
+}
 
 int
 hed_encode_ether_addr_from_json(struct dpack_encoder * encoder,
@@ -65,6 +102,34 @@ hed_decode_ether_addr_to_json(struct dpack_decoder * decoder)
 	obj = json_object_new_string(asc);
 error:
 	return obj;
+}
+
+int
+hed_check_in_addr(const struct in_addr *addr __unused)
+{
+	hed_assert_api(addr);
+
+	return 0;
+}
+
+int
+hed_encode_in_addr(struct dpack_encoder * encoder,
+                   const struct in_addr * addr)
+{
+	hed_assert_api(encoder);
+	hed_assert_api(addr);
+
+	return dpack_encode_uint(encoder, addr->s_addr);
+}
+
+int
+hed_decode_in_addr(struct dpack_decoder * decoder,
+                   struct in_addr       * addr)
+{
+	hed_assert_api(decoder);
+	hed_assert_api(addr);
+
+	return dpack_decode_uint(decoder, &addr->s_addr);
 }
 
 int
@@ -128,6 +193,34 @@ error:
 }
 
 int
+hed_check_in6_addr(const struct in6_addr *addr __unused)
+{
+	hed_assert_api(addr);
+
+	return 0;
+}
+
+int
+hed_encode_in6_addr(struct dpack_encoder  * encoder,
+                    const struct in6_addr * addr)
+{
+	hed_assert_api(encoder);
+	hed_assert_api(addr);
+
+	return dpack_encode_bin(encoder, (const char *)addr->s6_addr, 16);
+}
+
+int
+hed_decode_in6_addr(struct dpack_decoder  * decoder,
+                    struct in6_addr       * addr)
+{
+	hed_assert_api(decoder);
+	hed_assert_api(addr);
+
+	return dpack_decode_bincpy_equ(decoder, 16, (char *)addr->s6_addr);
+}
+
+int
 hed_encode_in6_addr_from_json(struct dpack_encoder * encoder,
                               struct json_object    * obj)
 {
@@ -187,3 +280,48 @@ error:
 	return obj;
 }
 
+int
+hed_in_net_check_addr_prefix(const struct hed_in_net * value)
+{
+	hed_assert_api(value);
+
+	const struct in_addr *addr;
+	unsigned long         mask;
+
+	addr = hed_const_in_net_get_addr(value);
+	mask = (1U << (unsigned long)hed_const_in_net_get_prefix(value)) - 1U;
+
+	return !!(addr->s_addr & mask);
+}
+
+int
+hed_in6_net_check_addr_prefix(const struct hed_in6_net * value)
+{
+	hed_assert_api(value);
+
+	const struct in6_addr *addr;
+	uint8_t                prefix;
+	uint8_t                mask;
+	uint8_t                ret = 0;
+
+	addr = hed_const_in6_net_get_addr(value);
+	prefix = hed_const_in6_net_get_prefix(value);
+	for (int i = 0; i < 16; i++) {
+		switch (prefix) {
+		case 0:
+			mask = 0xFF;
+			break;
+		case 1 ... 7:
+			mask = (uint8_t)((1 << prefix) - 1);
+			prefix = 0;
+			break;
+		default:
+			mask = 0;
+			prefix = (uint8_t)(prefix - 8);
+			break;
+		}
+		ret |= addr->s6_addr[i] & mask;
+	}
+
+	return !!ret;
+}
