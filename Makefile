@@ -29,20 +29,17 @@ include $(EBUILDDIR)/main.mk
 
 yml := $(patsubst include/hed/%.yml,%,$(wildcard include/hed/*.yml))
 
-$(CURDIR)/troer/%:
-	@mkdir -p $(@)
-
 define troer_recipe
 @echo "  TROER   $(strip $(1))"
-$(Q)$(TROER) --no-indent --json --makefile no $(3) $(strip $(1)) $(strip $(2))
+$(Q)$(TROER) --no-indent --json --makefile no $(3) "$(strip $(1))" "$(strip $(2))"
 endef
 
 .PHONY: troer
-troer: | $(patsubst %,$(CURDIR)/troer/%,$(yml))
+troer:
 	$(foreach y,$(yml),\
 	          $(call troer_recipe,$(CURDIR)/include/hed/$(y).yml,\
-	                              $(CURDIR)/lib/,\
-	                              --include-dir $(CURDIR)/include/hed/ \
+	                              $(CURDIR)/lib,\
+	                              --include-dir $(CURDIR)/include/hed \
 	                              --include-prefix hed/ \
 	                              $(EXTRA_TROER_ARGS))$(newline))
 
