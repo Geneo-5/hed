@@ -93,7 +93,7 @@ dpack_decoder_abort(struct dpack_decoder * decoder,
 
 void
 hed_decoder_init(struct dpack_decoder * decoder,
-                 struct galv_sess_msg * msg)
+                 struct hed_rpc_msg   * msg)
 {
 	hed_assert_api(decoder);
 	hed_assert_api(msg);
@@ -107,7 +107,7 @@ hed_decoder_init(struct dpack_decoder * decoder,
 	}
 
 	mpack_reader_init(decoder->mpack, buffer, capacity, 0);
-	mpack_reader_set_context(decoder->mpack, msg);
+	mpack_reader_set_context(decoder->mpack, &msg->super);
 	mpack_reader_set_fill(decoder->mpack, hed_reader_fill);
 	mpack_reader_set_skip(decoder->mpack, hed_reader_skip);
 	mpack_reader_set_teardown(decoder->mpack, hed_reader_teardown);
@@ -154,7 +154,7 @@ hed_writer_teardown(mpack_writer_t * writer)
 
 void
 hed_encoder_init(struct dpack_encoder * encoder,
-                 struct galv_sess_msg * msg)
+                 struct hed_rpc_msg   * msg)
 {
 	hed_assert_api(encoder);
 	hed_assert_api(msg);
@@ -168,7 +168,7 @@ hed_encoder_init(struct dpack_encoder * encoder,
 	}
 
 	mpack_writer_init(encoder->mpack, buffer, capacity);
-	mpack_writer_set_context(encoder->mpack, msg);
+	mpack_writer_set_context(encoder->mpack, &msg->super);
 	mpack_writer_set_flush(encoder->mpack, hed_writer_flush);
 	mpack_writer_set_teardown(encoder->mpack, hed_writer_teardown);
 }

@@ -288,8 +288,8 @@ hed_in_net_check_addr_prefix(const struct hed_in_net * value)
 	const struct in_addr *addr;
 	unsigned long         mask;
 
-	addr = hed_const_in_net_get_addr(value);
-	mask = (1U << (unsigned long)hed_const_in_net_get_prefix(value)) - 1U;
+	addr = hed_in_net_get_addr(value);
+	mask = (1U << (unsigned long)hed_in_net_get_prefix(value)) - 1U;
 
 	return !!(addr->s_addr & mask);
 }
@@ -304,8 +304,8 @@ hed_in6_net_check_addr_prefix(const struct hed_in6_net * value)
 	uint8_t                mask;
 	uint8_t                ret = 0;
 
-	addr = hed_const_in6_net_get_addr(value);
-	prefix = hed_const_in6_net_get_prefix(value);
+	addr = hed_in6_net_get_addr(value);
+	prefix = hed_in6_net_get_prefix(value);
 	for (int i = 0; i < 16; i++) {
 		switch (prefix) {
 		case 0:

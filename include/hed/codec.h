@@ -9,7 +9,7 @@
 
 #include <hed/cdefs.h>
 #include <dpack/codec.h>
-#include <galv/session.h>
+#include <galv/rpc.h>
 
 /**
  * Initialize a MessagePack encoder with galv session message
@@ -30,7 +30,7 @@
  */
 extern void
 hed_encoder_init(struct dpack_encoder * encoder,
-                 struct galv_sess_msg * msg)
+                 struct hed_rpc_ms  g * msg)
 	__hed_nonull(1, 2);
 
 /**
@@ -81,7 +81,7 @@ hed_encoder_fini(struct dpack_encoder * encoder, bool abort)
  */
 extern void
 hed_decoder_init(struct dpack_decoder * decoder,
-                 struct galv_sess_msg * msg)
+                 struct hed_rpc_msg   * msg)
 	__hed_nonull(1, 2);
 
 /**
@@ -99,7 +99,7 @@ hed_decoder_init(struct dpack_decoder * decoder,
  * - hed_decoder_init()
  */
 static inline void __dpack_nonull(1)
-hed_decoder_fini(struct dpack_decoder * decoderr, bool abort)
+hed_decoder_fini(struct dpack_decoder * decoder)
 {
 	hed_assert_api(decoder);
 

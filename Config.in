@@ -47,3 +47,14 @@ config HED_TROER_INET
 	help
 	  Build hed serialisable library usable with troer.
 
+config HED_CONN_NR
+	int "Repo max connexion number"
+	default 32
+	help
+	  Default nb connexion in repo
+
+config HED_BUFF_CAPA_MAX
+	int "Buff capa max size"
+	default 4096
+	help
+	  Default nb connexion in repo

@@ -599,7 +599,13 @@ static inline int __hed_nonull(1, 2) __nothrow __warn_result
 hed_decode_ip_type(struct dpack_decoder * decoder,
 	  enum hed_ip_type * __restrict value)
 {
-	return dpack_decode_int(decoder, (int *)value);
+	int ret;
+
+	ret = dpack_decode_int(decoder, (int *)value);
+	if (ret)
+		return ret;
+
+	return hed_check_ip_type(*value);
 };
 
 /**
@@ -1339,46 +1345,29 @@ hed_fini_in_svc(struct hed_in_svc * value)
  __hed_nonull(1) ;
 
 static inline struct in_addr* __hed_nonull(1) 
-hed_in_svc_get_addr(struct hed_in_svc * value)
+hed_in_svc_get_addr(const struct hed_in_svc * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in_svc(value) == 0);
 
-	return &value->addr;
-}
-
-static inline const struct in_addr* __hed_nonull(1) 
-hed_const_in_svc_get_addr(const struct hed_in_svc * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in_svc(value) == 0);
-
-	return &value->addr;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (struct in_addr*)&value->addr;
+STROLL_RESTORE_WARN
 }
 
 static inline uint16_t __hed_nonull(1) 
-hed_in_svc_get_port(struct hed_in_svc * value)
+hed_in_svc_get_port(const struct hed_in_svc * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in_svc(value) == 0);
 
-	return value->port;
-}
-
-static inline uint16_t __hed_nonull(1) 
-hed_const_in_svc_get_port(const struct hed_in_svc * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in_svc(value) == 0);
-
-	return value->port;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (uint16_t)value->port;
+STROLL_RESTORE_WARN
 }
 
 static inline void __hed_nonull(1) 
 hed_in_svc_set_port(struct hed_in_svc * data, uint16_t value)
 {
 	hed_assert(data);
-	hed_assert(hed_check_port(value) == 0);
 
 	data->port = value;
 }
@@ -1559,46 +1548,29 @@ hed_fini_in6_svc(struct hed_in6_svc * value)
  __hed_nonull(1) ;
 
 static inline struct in6_addr* __hed_nonull(1) 
-hed_in6_svc_get_addr(struct hed_in6_svc * value)
+hed_in6_svc_get_addr(const struct hed_in6_svc * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in6_svc(value) == 0);
 
-	return &value->addr;
-}
-
-static inline const struct in6_addr* __hed_nonull(1) 
-hed_const_in6_svc_get_addr(const struct hed_in6_svc * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in6_svc(value) == 0);
-
-	return &value->addr;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (struct in6_addr*)&value->addr;
+STROLL_RESTORE_WARN
 }
 
 static inline uint16_t __hed_nonull(1) 
-hed_in6_svc_get_port(struct hed_in6_svc * value)
+hed_in6_svc_get_port(const struct hed_in6_svc * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in6_svc(value) == 0);
 
-	return value->port;
-}
-
-static inline uint16_t __hed_nonull(1) 
-hed_const_in6_svc_get_port(const struct hed_in6_svc * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in6_svc(value) == 0);
-
-	return value->port;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (uint16_t)value->port;
+STROLL_RESTORE_WARN
 }
 
 static inline void __hed_nonull(1) 
 hed_in6_svc_set_port(struct hed_in6_svc * data, uint16_t value)
 {
 	hed_assert(data);
-	hed_assert(hed_check_port(value) == 0);
 
 	data->port = value;
 }
@@ -1792,46 +1764,29 @@ hed_fini_in_net(struct hed_in_net * value)
  __hed_nonull(1) ;
 
 static inline struct in_addr* __hed_nonull(1) 
-hed_in_net_get_addr(struct hed_in_net * value)
+hed_in_net_get_addr(const struct hed_in_net * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in_net(value) == 0);
 
-	return &value->addr;
-}
-
-static inline const struct in_addr* __hed_nonull(1) 
-hed_const_in_net_get_addr(const struct hed_in_net * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in_net(value) == 0);
-
-	return &value->addr;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (struct in_addr*)&value->addr;
+STROLL_RESTORE_WARN
 }
 
 static inline uint8_t __hed_nonull(1) 
-hed_in_net_get_prefix(struct hed_in_net * value)
+hed_in_net_get_prefix(const struct hed_in_net * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in_net(value) == 0);
 
-	return value->prefix;
-}
-
-static inline uint8_t __hed_nonull(1) 
-hed_const_in_net_get_prefix(const struct hed_in_net * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in_net(value) == 0);
-
-	return value->prefix;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (uint8_t)value->prefix;
+STROLL_RESTORE_WARN
 }
 
 static inline void __hed_nonull(1) 
 hed_in_net_set_prefix(struct hed_in_net * data, uint8_t value)
 {
 	hed_assert(data);
-	hed_assert(hed_check_in_pfx(value) == 0);
 
 	data->prefix = value;
 }
@@ -2025,46 +1980,29 @@ hed_fini_in6_net(struct hed_in6_net * value)
  __hed_nonull(1) ;
 
 static inline struct in6_addr* __hed_nonull(1) 
-hed_in6_net_get_addr(struct hed_in6_net * value)
+hed_in6_net_get_addr(const struct hed_in6_net * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in6_net(value) == 0);
 
-	return &value->addr;
-}
-
-static inline const struct in6_addr* __hed_nonull(1) 
-hed_const_in6_net_get_addr(const struct hed_in6_net * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in6_net(value) == 0);
-
-	return &value->addr;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (struct in6_addr*)&value->addr;
+STROLL_RESTORE_WARN
 }
 
 static inline uint8_t __hed_nonull(1) 
-hed_in6_net_get_prefix(struct hed_in6_net * value)
+hed_in6_net_get_prefix(const struct hed_in6_net * value)
 {
 	hed_assert(value);
-	hed_assert(hed_check_in6_net(value) == 0);
 
-	return value->prefix;
-}
-
-static inline uint8_t __hed_nonull(1) 
-hed_const_in6_net_get_prefix(const struct hed_in6_net * value)
-{
-	hed_assert(value);
-	hed_assert(hed_check_in6_net(value) == 0);
-
-	return value->prefix;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	return (uint8_t)value->prefix;
+STROLL_RESTORE_WARN
 }
 
 static inline void __hed_nonull(1) 
 hed_in6_net_set_prefix(struct hed_in6_net * data, uint8_t value)
 {
 	hed_assert(data);
-	hed_assert(hed_check_in6_pfx(value) == 0);
 
 	data->prefix = value;
 }

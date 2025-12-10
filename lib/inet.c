@@ -294,7 +294,7 @@ hed_decode_in_svc(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return 0;
+	return hed_check_in_svc(value);
 }
 
 extern int __hed_nonull(1) __nothrow __warn_result 
@@ -362,6 +362,7 @@ hed_encode_in_svc_from_json(struct dpack_encoder * encoder,
 
 	int ret;
 	struct json_object *obj;
+	size_t nb __unused;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
@@ -433,7 +434,7 @@ hed_decode_in6_svc(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return 0;
+	return hed_check_in6_svc(value);
 }
 
 extern int __hed_nonull(1) __nothrow __warn_result 
@@ -501,6 +502,7 @@ hed_encode_in6_svc_from_json(struct dpack_encoder * encoder,
 
 	int ret;
 	struct json_object *obj;
+	size_t nb __unused;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
@@ -572,7 +574,7 @@ hed_decode_in_net(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return 0;
+	return hed_check_in_net(value);
 }
 
 extern int __hed_nonull(1) __nothrow __warn_result 
@@ -640,6 +642,7 @@ hed_encode_in_net_from_json(struct dpack_encoder * encoder,
 
 	int ret;
 	struct json_object *obj;
+	size_t nb __unused;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
@@ -711,7 +714,7 @@ hed_decode_in6_net(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return 0;
+	return hed_check_in6_net(value);
 }
 
 extern int __hed_nonull(1) __nothrow __warn_result 
@@ -779,6 +782,7 @@ hed_encode_in6_net_from_json(struct dpack_encoder * encoder,
 
 	int ret;
 	struct json_object *obj;
+	size_t nb __unused;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
