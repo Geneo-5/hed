@@ -7,8 +7,8 @@
 include ../common.mk
 
 libhed-objects  := codec.o rpc.o server.o
-libhed-objects  += $(call kconf_enabled,HED_TROER_BASE,base.o)
-libhed-objects  += $(call kconf_enabled,HED_TROER_INET,inet.o inet-impl.o)
+libhed-objects  += $(call kconf_enabled,HED_TROER_BASE,base.o base-json.o)
+libhed-objects  += $(call kconf_enabled,HED_TROER_INET,inet.o inet-json.o inet-impl.o)
 
 solibs             := libhed.so
 libhed.so-objs     := $(addprefix shared/,$(libhed-objects))
