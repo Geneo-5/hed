@@ -480,6 +480,8 @@ hed_encode_in6_addr_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
+
+
 /**
  * Minimum size in bytes of an enum hed_ip_type serialized according to
  * the @rstsubst{MessagePack int format}.
@@ -561,7 +563,7 @@ hed_ip_type_dump_str(const char ** buf, size_t nr)
  * @retval -EINVAL Invalid value
  */
 static inline int __warn_result 
-hed_check_ip_type(enum hed_ip_type value)
+hed_chk_ip_type(enum hed_ip_type value)
 {
 	if (hed_ip_type_to_str(value) == NULL)
 		return -EINVAL;
@@ -596,16 +598,19 @@ hed_check_ip_type(enum hed_ip_type value)
  * - dpack_decoder_init_skip_buffer()
  */
 static inline int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_decode_ip_type(struct dpack_decoder * decoder,
+hed_dec_ip_type(struct dpack_decoder * decoder,
 	  enum hed_ip_type * __restrict value)
 {
+	hed_assert(decoder);
+	hed_assert(value);
+
 	int ret;
 
 	ret = dpack_decode_int(decoder, (int *)value);
 	if (ret)
 		return ret;
 
-	return hed_check_ip_type(*value);
+	return hed_chk_ip_type(*value);
 };
 
 /**
@@ -630,9 +635,11 @@ hed_decode_ip_type(struct dpack_decoder * decoder,
  * - dpack_encoder_init_buffer()
  */
 static inline int __hed_nonull(1) __nothrow __warn_result 
-hed_encode_ip_type(struct dpack_encoder * encoder,
+hed_enc_ip_type(struct dpack_encoder * encoder,
 	  enum hed_ip_type value)
 {
+	hed_assert(encoder);
+
 	return dpack_encode_int(encoder, (int)value);
 };
 
@@ -662,7 +669,7 @@ hed_encode_ip_type(struct dpack_encoder * encoder,
  * - dpack_decoder_init_skip_buffer()
  */
 extern struct json_object *
-hed_decode_ip_type_to_json(struct dpack_decoder * decoder)
+hed_dec_ip_type_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -688,7 +695,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_ip_type_from_json(struct dpack_encoder * encoder,
+hed_enc_ip_type_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -715,7 +722,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * @retval -EINVAL Invalid value
  */
 static inline int 
-hed_check_in_pfx(const uint8_t value __unused)
+hed_chk_in_pfx(const uint8_t value __unused)
 {
 	if (value >= 32)
 		return -EINVAL;
@@ -749,7 +756,7 @@ hed_check_in_pfx(const uint8_t value __unused)
  * - dpack_decoder_init_skip_buffer()
  */
 static inline int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_decode_in_pfx(struct dpack_decoder * decoder,
+hed_dec_in_pfx(struct dpack_decoder * decoder,
 	  uint8_t * __restrict value)
 {
 	hed_assert(decoder);
@@ -761,7 +768,7 @@ hed_decode_in_pfx(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return hed_check_in_pfx(*value);
+	return hed_chk_in_pfx(*value);
 };
 
 /**
@@ -786,11 +793,11 @@ hed_decode_in_pfx(struct dpack_decoder * decoder,
  * - dpack_encoder_init_buffer()
  */
 static inline int __hed_nonull(1) __nothrow __warn_result 
-hed_encode_in_pfx(struct dpack_encoder * encoder,
+hed_enc_in_pfx(struct dpack_encoder * encoder,
 	  uint8_t value)
 {
 	hed_assert(encoder);
-	hed_assert(hed_check_in_pfx(value) == 0);
+	hed_assert(hed_chk_in_pfx(value) == 0);
 
 	return dpack_encode_uint8(encoder, value);
 };
@@ -821,7 +828,7 @@ hed_encode_in_pfx(struct dpack_encoder * encoder,
  * - dpack_decoder_init_skip_buffer()
  */
 extern struct json_object *
-hed_decode_in_pfx_to_json(struct dpack_decoder * decoder)
+hed_dec_in_pfx_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -847,7 +854,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_in_pfx_from_json(struct dpack_encoder * encoder,
+hed_enc_in_pfx_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -874,7 +881,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * @retval -EINVAL Invalid value
  */
 static inline int 
-hed_check_in6_pfx(const uint8_t value __unused)
+hed_chk_in6_pfx(const uint8_t value __unused)
 {
 	if (value >= 128)
 		return -EINVAL;
@@ -908,7 +915,7 @@ hed_check_in6_pfx(const uint8_t value __unused)
  * - dpack_decoder_init_skip_buffer()
  */
 static inline int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_decode_in6_pfx(struct dpack_decoder * decoder,
+hed_dec_in6_pfx(struct dpack_decoder * decoder,
 	  uint8_t * __restrict value)
 {
 	hed_assert(decoder);
@@ -920,7 +927,7 @@ hed_decode_in6_pfx(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return hed_check_in6_pfx(*value);
+	return hed_chk_in6_pfx(*value);
 };
 
 /**
@@ -945,11 +952,11 @@ hed_decode_in6_pfx(struct dpack_decoder * decoder,
  * - dpack_encoder_init_buffer()
  */
 static inline int __hed_nonull(1) __nothrow __warn_result 
-hed_encode_in6_pfx(struct dpack_encoder * encoder,
+hed_enc_in6_pfx(struct dpack_encoder * encoder,
 	  uint8_t value)
 {
 	hed_assert(encoder);
-	hed_assert(hed_check_in6_pfx(value) == 0);
+	hed_assert(hed_chk_in6_pfx(value) == 0);
 
 	return dpack_encode_uint8(encoder, value);
 };
@@ -980,7 +987,7 @@ hed_encode_in6_pfx(struct dpack_encoder * encoder,
  * - dpack_decoder_init_skip_buffer()
  */
 extern struct json_object *
-hed_decode_in6_pfx_to_json(struct dpack_decoder * decoder)
+hed_dec_in6_pfx_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -1006,7 +1013,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_in6_pfx_from_json(struct dpack_encoder * encoder,
+hed_enc_in6_pfx_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1033,7 +1040,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * @retval -EINVAL Invalid value
  */
 static inline int 
-hed_check_port(const uint16_t value __unused)
+hed_chk_port(const uint16_t value __unused)
 {
 	if (value < 1)
 		return -EINVAL;
@@ -1067,7 +1074,7 @@ hed_check_port(const uint16_t value __unused)
  * - dpack_decoder_init_skip_buffer()
  */
 static inline int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_decode_port(struct dpack_decoder * decoder,
+hed_dec_port(struct dpack_decoder * decoder,
 	  uint16_t * __restrict value)
 {
 	hed_assert(decoder);
@@ -1079,7 +1086,7 @@ hed_decode_port(struct dpack_decoder * decoder,
 	if (ret)
 		return ret;
 
-	return hed_check_port(*value);
+	return hed_chk_port(*value);
 };
 
 /**
@@ -1104,11 +1111,11 @@ hed_decode_port(struct dpack_decoder * decoder,
  * - dpack_encoder_init_buffer()
  */
 static inline int __hed_nonull(1) __nothrow __warn_result 
-hed_encode_port(struct dpack_encoder * encoder,
+hed_enc_port(struct dpack_encoder * encoder,
 	  uint16_t value)
 {
 	hed_assert(encoder);
-	hed_assert(hed_check_port(value) == 0);
+	hed_assert(hed_chk_port(value) == 0);
 
 	return dpack_encode_uint16(encoder, value);
 };
@@ -1139,7 +1146,7 @@ hed_encode_port(struct dpack_encoder * encoder,
  * - dpack_decoder_init_skip_buffer()
  */
 extern struct json_object *
-hed_decode_port_to_json(struct dpack_decoder * decoder)
+hed_dec_port_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -1165,7 +1172,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_port_from_json(struct dpack_encoder * encoder,
+hed_enc_port_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1177,16 +1184,16 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN_SVC_PACKED_SIZE_MIN \
-	HED_IN_ADDR_PACKED_SIZE_MIN + \
-	HED_PORT_PACKED_SIZE_MIN
+	(HED_IN_ADDR_PACKED_SIZE_MIN + \
+	 HED_PORT_PACKED_SIZE_MIN)
 	
 /**
  * Maximum size in bytes of an struct hed_in_svc serialized according to
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN_SVC_PACKED_SIZE_MAX \
-	HED_IN_ADDR_PACKED_SIZE_MAX + \
-	HED_PORT_PACKED_SIZE_MAX
+	(HED_IN_ADDR_PACKED_SIZE_MAX + \
+	 HED_PORT_PACKED_SIZE_MAX)
 
 struct hed_in_svc {
 	struct in_addr addr;
@@ -1203,7 +1210,7 @@ struct hed_in_svc {
  * @retval -EINVAL Invalid value
  */
 extern int
-hed_check_in_svc(const struct hed_in_svc * value)
+hed_chk_in_svc(const struct hed_in_svc * value)
 __hed_nonull(1) __warn_result ;
 
 /**
@@ -1236,7 +1243,7 @@ __hed_nonull(1) __warn_result ;
  * - hed_init_in_svc()
  */
 extern int
-hed_decode_in_svc(struct dpack_decoder * decoder,
+hed_dec_in_svc(struct dpack_decoder * decoder,
 	  struct hed_in_svc * __restrict value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1265,7 +1272,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - hed_init_in_svc()
  */
 extern int
-hed_encode_in_svc(struct dpack_encoder * encoder,
+hed_enc_in_svc(struct dpack_encoder * encoder,
 	  const struct hed_in_svc * value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1294,8 +1301,8 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - dpack_decoder_init_buffer()
  * - dpack_decoder_init_skip_buffer()
  */
-struct json_object *
-hed_decode_in_svc_to_json(struct dpack_decoder * decoder)
+extern struct json_object *
+hed_dec_in_svc_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -1321,7 +1328,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_in_svc_from_json(struct dpack_encoder * encoder,
+hed_enc_in_svc_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1380,16 +1387,16 @@ hed_in_svc_set_port(struct hed_in_svc * data, uint16_t value)
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN6_SVC_PACKED_SIZE_MIN \
-	HED_IN6_ADDR_PACKED_SIZE_MIN + \
-	HED_PORT_PACKED_SIZE_MIN
+	(HED_IN6_ADDR_PACKED_SIZE_MIN + \
+	 HED_PORT_PACKED_SIZE_MIN)
 	
 /**
  * Maximum size in bytes of an struct hed_in6_svc serialized according to
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN6_SVC_PACKED_SIZE_MAX \
-	HED_IN6_ADDR_PACKED_SIZE_MAX + \
-	HED_PORT_PACKED_SIZE_MAX
+	(HED_IN6_ADDR_PACKED_SIZE_MAX + \
+	 HED_PORT_PACKED_SIZE_MAX)
 
 struct hed_in6_svc {
 	struct in6_addr addr;
@@ -1406,7 +1413,7 @@ struct hed_in6_svc {
  * @retval -EINVAL Invalid value
  */
 extern int
-hed_check_in6_svc(const struct hed_in6_svc * value)
+hed_chk_in6_svc(const struct hed_in6_svc * value)
 __hed_nonull(1) __warn_result ;
 
 /**
@@ -1439,7 +1446,7 @@ __hed_nonull(1) __warn_result ;
  * - hed_init_in6_svc()
  */
 extern int
-hed_decode_in6_svc(struct dpack_decoder * decoder,
+hed_dec_in6_svc(struct dpack_decoder * decoder,
 	  struct hed_in6_svc * __restrict value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1468,7 +1475,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - hed_init_in6_svc()
  */
 extern int
-hed_encode_in6_svc(struct dpack_encoder * encoder,
+hed_enc_in6_svc(struct dpack_encoder * encoder,
 	  const struct hed_in6_svc * value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1497,8 +1504,8 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - dpack_decoder_init_buffer()
  * - dpack_decoder_init_skip_buffer()
  */
-struct json_object *
-hed_decode_in6_svc_to_json(struct dpack_decoder * decoder)
+extern struct json_object *
+hed_dec_in6_svc_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -1524,7 +1531,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_in6_svc_from_json(struct dpack_encoder * encoder,
+hed_enc_in6_svc_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1583,16 +1590,16 @@ hed_in6_svc_set_port(struct hed_in6_svc * data, uint16_t value)
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN_NET_PACKED_SIZE_MIN \
-	HED_IN_ADDR_PACKED_SIZE_MIN + \
-	HED_IN_PFX_PACKED_SIZE_MIN
+	(HED_IN_ADDR_PACKED_SIZE_MIN + \
+	 HED_IN_PFX_PACKED_SIZE_MIN)
 	
 /**
  * Maximum size in bytes of an struct hed_in_net serialized according to
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN_NET_PACKED_SIZE_MAX \
-	HED_IN_ADDR_PACKED_SIZE_MAX + \
-	HED_IN_PFX_PACKED_SIZE_MAX
+	(HED_IN_ADDR_PACKED_SIZE_MAX + \
+	 HED_IN_PFX_PACKED_SIZE_MAX)
 
 struct hed_in_net {
 	struct in_addr addr;
@@ -1622,7 +1629,7 @@ __hed_nonull(1) __warn_result;
  * @retval -EINVAL Invalid value
  */
 extern int
-hed_check_in_net(const struct hed_in_net * value)
+hed_chk_in_net(const struct hed_in_net * value)
 __hed_nonull(1) __warn_result ;
 
 /**
@@ -1655,7 +1662,7 @@ __hed_nonull(1) __warn_result ;
  * - hed_init_in_net()
  */
 extern int
-hed_decode_in_net(struct dpack_decoder * decoder,
+hed_dec_in_net(struct dpack_decoder * decoder,
 	  struct hed_in_net * __restrict value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1684,7 +1691,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - hed_init_in_net()
  */
 extern int
-hed_encode_in_net(struct dpack_encoder * encoder,
+hed_enc_in_net(struct dpack_encoder * encoder,
 	  const struct hed_in_net * value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1713,8 +1720,8 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - dpack_decoder_init_buffer()
  * - dpack_decoder_init_skip_buffer()
  */
-struct json_object *
-hed_decode_in_net_to_json(struct dpack_decoder * decoder)
+extern struct json_object *
+hed_dec_in_net_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -1740,7 +1747,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_in_net_from_json(struct dpack_encoder * encoder,
+hed_enc_in_net_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1799,16 +1806,16 @@ hed_in_net_set_prefix(struct hed_in_net * data, uint8_t value)
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN6_NET_PACKED_SIZE_MIN \
-	HED_IN6_ADDR_PACKED_SIZE_MIN + \
-	HED_IN6_PFX_PACKED_SIZE_MIN
+	(HED_IN6_ADDR_PACKED_SIZE_MIN + \
+	 HED_IN6_PFX_PACKED_SIZE_MIN)
 	
 /**
  * Maximum size in bytes of an struct hed_in6_net serialized according to
  * the @rstsubst{MessagePack int format}.
  */
 #define HED_IN6_NET_PACKED_SIZE_MAX \
-	HED_IN6_ADDR_PACKED_SIZE_MAX + \
-	HED_IN6_PFX_PACKED_SIZE_MAX
+	(HED_IN6_ADDR_PACKED_SIZE_MAX + \
+	 HED_IN6_PFX_PACKED_SIZE_MAX)
 
 struct hed_in6_net {
 	struct in6_addr addr;
@@ -1838,7 +1845,7 @@ __hed_nonull(1) __warn_result;
  * @retval -EINVAL Invalid value
  */
 extern int
-hed_check_in6_net(const struct hed_in6_net * value)
+hed_chk_in6_net(const struct hed_in6_net * value)
 __hed_nonull(1) __warn_result ;
 
 /**
@@ -1871,7 +1878,7 @@ __hed_nonull(1) __warn_result ;
  * - hed_init_in6_net()
  */
 extern int
-hed_decode_in6_net(struct dpack_decoder * decoder,
+hed_dec_in6_net(struct dpack_decoder * decoder,
 	  struct hed_in6_net * __restrict value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1900,7 +1907,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - hed_init_in6_net()
  */
 extern int
-hed_encode_in6_net(struct dpack_encoder * encoder,
+hed_enc_in6_net(struct dpack_encoder * encoder,
 	  const struct hed_in6_net * value)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
@@ -1929,8 +1936,8 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
  * - dpack_decoder_init_buffer()
  * - dpack_decoder_init_skip_buffer()
  */
-struct json_object *
-hed_decode_in6_net_to_json(struct dpack_decoder * decoder)
+extern struct json_object *
+hed_dec_in6_net_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -1956,7 +1963,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_in6_net_from_json(struct dpack_encoder * encoder,
+hed_enc_in6_net_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 

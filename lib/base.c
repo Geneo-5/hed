@@ -8,7 +8,7 @@
 #include <hed/base.h>
 
 extern int __hed_nonull(1) __warn_result 
-hed_check_name(struct stroll_lvstr * value)
+hed_chk_name(const struct stroll_lvstr * value)
 {
 	hed_assert(value);
 
@@ -48,7 +48,7 @@ hed_check_name(struct stroll_lvstr * value)
 }
 
 extern struct json_object * __hed_nonull(1) __nothrow __warn_result 
-hed_decode_name_to_json(struct dpack_decoder * decoder)
+hed_dec_name_to_json(struct dpack_decoder * decoder)
 {
 	hed_assert(decoder);
 
@@ -69,7 +69,7 @@ hed_decode_name_to_json(struct dpack_decoder * decoder)
 		goto error;
 	}
 
-	ret = hed_check_name(&value);
+	ret = hed_chk_name(&value);
 	if (ret) {
 		errno = -ret;
 		goto error;
@@ -82,7 +82,7 @@ error:
 };
 
 extern int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_encode_name_from_json(struct dpack_encoder * encoder,
+hed_enc_name_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 {
 	hed_assert(encoder);
@@ -106,7 +106,7 @@ hed_encode_name_from_json(struct dpack_encoder * encoder,
 	if (ret)
 		goto error;
 
-	ret = hed_check_name(&value);
+	ret = hed_chk_name(&value);
 	if (ret)
 		goto error;
 

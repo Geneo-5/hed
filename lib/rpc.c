@@ -5,6 +5,8 @@
  ******************************************************************************/
 
 #include "hed/rpc.h"
+#include "hed/codec.h"
+#include <dpack/scalar.h>
 
 static int __hed_nonull(1)
 hed_rpc_xfer(struct galv_sess_conn * ctx)
@@ -17,8 +19,8 @@ hed_rpc_xfer(struct galv_sess_conn * ctx)
 	uint32_t              id;
 	int                   ret = 0;
 
-	while(galv_sess_may_pull_msg(conn)) {
-		msg = (struct hed_rpc_msg *)galv_sess_pull_msg(conn);
+	while(hed_rpc_may_pull_msg(conn)) {
+		msg = hed_rpc_pull_msg(conn);
 		hed_assert_intern(msg);
 
 		hed_decoder_init(&decoder, msg);
@@ -29,7 +31,7 @@ hed_rpc_xfer(struct galv_sess_conn * ctx)
 			break;
 		}
 
-		if (hed_rpc_msg_get_type(msg) == GALV_SESS_HEAD_REPLY_TYPE) {
+		if (hed_rpc_msg_type(msg) == GALV_SESS_HEAD_REPLY_TYPE) {
 			if (msg->id != id) {
 				ret = -EINVAL;
 				hed_rpc_drop_msg(msg);
@@ -40,7 +42,7 @@ hed_rpc_xfer(struct galv_sess_conn * ctx)
 			msg->id = id;
 		}
 
-		if ((msg->id >= conn->rpc_nb) || (conn->rpc[msg->id] == NULL) {
+		if ((msg->id >= conn->rpc_nb) || !conn->rpc[msg->id]) {
 			ret = -EPERM;
 			hed_rpc_drop_msg(msg);
 			break;
@@ -58,17 +60,17 @@ static const struct galv_sess_ops hed_rpc_ops = {
 };
 
 extern int __hed_nonull(1, 2, 3, 4, 5)
-hed_rpc_open_accept(struct hed_rpc_accept      * acceptor,
-                    struct glav_repo           * repository,
-                    struct galv_adopt          * adopter,
-                    const struct upoll         * poller,
-                    struct hed_rpc_accept_conf * conf)
+hed_rpc_open_accept(struct hed_rpc_accept            * acceptor,
+                    struct galv_repo                 * repository,
+                    struct galv_adopt                * adopter,
+                    const struct upoll               * poller,
+                    const struct hed_rpc_accept_conf * conf)
 {
-	hed_assert(acceptor);
-	hed_assert(repository);
-	hed_assert(adopter);
-	hed_assert(poller);
-	hed_assert(conf);
+	hed_assert_api(acceptor);
+	hed_assert_api(repository);
+	hed_assert_api(adopter);
+	hed_assert_api(poller);
+	hed_assert_api(conf);
 
 	int ret;
 
@@ -81,8 +83,10 @@ hed_rpc_open_accept(struct hed_rpc_accept      * acceptor,
 	if (ret)
 		return ret;
 
-	acceptor->id_max = conf->id_max;
-	acceptor->rpc_nb = conf->rpc_nb;
-	acceptor->rpc    = conf->rpc;
+STROLL_IGNORE_WARN("-Wcast-qual")
+	*(uint32_t *)&acceptor->id_max = conf->id_max;
+	*(unsigned int *)&acceptor->rpc_nb = conf->rpc_nb;
+	*(struct hed_rpc_auth **)&acceptor->rpc = conf->rpc;
+STROLL_RESTORE_WARN
 	return 0;
 }

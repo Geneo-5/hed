@@ -14,7 +14,7 @@ hed_reader_fill(mpack_reader_t * reader, char * buffer, size_t count)
 	hed_assert_intern(buffer);
 
 	struct galv_sess_msg *msg = mpack_reader_context(reader);
-	uint8_t              *data;
+	const uint8_t        *data;
 	ssize_t               size;
 	size_t                ret = 0;
 
@@ -31,12 +31,12 @@ hed_reader_fill(mpack_reader_t * reader, char * buffer, size_t count)
 		}
 
 		hed_assert_intern(data);
-		hed_assert_intern(size <= count);
+		hed_assert_intern((size_t)size <= count);
 
-		memcpy(buffer, data, size);
-		count -= size;
-		buffer += size;
-		ret += size;
+		memcpy(buffer, data, (size_t)size);
+		count  -= (size_t)size;
+		buffer += (size_t)size;
+		ret    += (size_t)size;
 	}
 
 	return ret;
@@ -48,7 +48,7 @@ hed_reader_skip(mpack_reader_t * reader, size_t count)
 	hed_assert_intern(reader);
 
 	struct galv_sess_msg *msg = mpack_reader_context(reader);
-	uint8_t              *data;
+	const uint8_t        *data;
 	ssize_t               size;
 
 	hed_assert_intern(msg);
@@ -57,13 +57,13 @@ hed_reader_skip(mpack_reader_t * reader, size_t count)
 		size = galv_sess_msg_pull_head(msg, &data, count);
 		if (size <= 0) {
 			mpack_reader_flag_error(reader, mpack_error_io);
-			return 0;
+			return;
 		}
 
 		hed_assert_intern(data);
-		hed_assert_intern(size <= count);
+		hed_assert_intern((size_t)size <= count);
 
-		count -= size;
+		count -= (size_t)size;
 	}
 }
 
@@ -82,9 +82,9 @@ hed_reader_teardown(mpack_reader_t * reader)
 }
 
 static void __hed_nonull(1)
-dpack_decoder_abort(struct dpack_decoder * decoder,
-                    enum mpack_type_t      type __unused,
-                    unsigned int           nr __unused)
+hed_decoder_abort(struct dpack_decoder * decoder,
+                  enum mpack_type_t      type __unused,
+                  unsigned int           nr __unused)
 {
 	hed_assert_intern(decoder);
 
@@ -102,15 +102,15 @@ hed_decoder_init(struct dpack_decoder * decoder,
 	char * buffer = malloc(capacity);
 
 	if (!buffer) {
-		mpack_reader_init_error(decoder->mpack, mpack_error_memory);
+		mpack_reader_init_error(&decoder->mpack, mpack_error_memory);
 		return;
 	}
 
-	mpack_reader_init(decoder->mpack, buffer, capacity, 0);
-	mpack_reader_set_context(decoder->mpack, &msg->super);
-	mpack_reader_set_fill(decoder->mpack, hed_reader_fill);
-	mpack_reader_set_skip(decoder->mpack, hed_reader_skip);
-	mpack_reader_set_teardown(decoder->mpack, hed_reader_teardown);
+	mpack_reader_init(&decoder->mpack, buffer, capacity, 0);
+	mpack_reader_set_context(&decoder->mpack, &msg->super);
+	mpack_reader_set_fill(&decoder->mpack, hed_reader_fill);
+	mpack_reader_set_skip(&decoder->mpack, hed_reader_skip);
+	mpack_reader_set_teardown(&decoder->mpack, hed_reader_teardown);
 	decoder->intr = hed_decoder_abort;
 }
 
@@ -134,11 +134,11 @@ hed_writer_flush(mpack_writer_t * writer, const char * buffer, size_t count)
 		}
 
 		hed_assert_intern(data);
-		hed_assert_intern(size <= count);
+		hed_assert_intern((size_t)size <= count);
 
-		memcpy(data, buffer, size);
-		count -= size;
-		buffer += size;
+		memcpy(data, buffer, (size_t)size);
+		count  -= (size_t)size;
+		buffer += (size_t)size;
 	}
 }
 
@@ -163,12 +163,12 @@ hed_encoder_init(struct dpack_encoder * encoder,
 	char * buffer = malloc(capacity);
 
 	if (!buffer) {
-		mpack_writer_init_error(encoder->mpack, mpack_error_memory);
+		mpack_writer_init_error(&encoder->mpack, mpack_error_memory);
 		return;
 	}
 
-	mpack_writer_init(encoder->mpack, buffer, capacity);
-	mpack_writer_set_context(encoder->mpack, &msg->super);
-	mpack_writer_set_flush(encoder->mpack, hed_writer_flush);
-	mpack_writer_set_teardown(encoder->mpack, hed_writer_teardown);
+	mpack_writer_init(&encoder->mpack, buffer, capacity);
+	mpack_writer_set_context(&encoder->mpack, &msg->super);
+	mpack_writer_set_flush(&encoder->mpack, hed_writer_flush);
+	mpack_writer_set_teardown(&encoder->mpack, hed_writer_teardown);
 }

@@ -8,8 +8,8 @@
 #define _HED_CODEC_H
 
 #include <hed/cdefs.h>
+#include <hed/rpc.h>
 #include <dpack/codec.h>
-#include <galv/rpc.h>
 
 /**
  * Initialize a MessagePack encoder with galv session message
@@ -30,7 +30,7 @@
  */
 extern void
 hed_encoder_init(struct dpack_encoder * encoder,
-                 struct hed_rpc_ms  g * msg)
+                 struct hed_rpc_msg   * msg)
 	__hed_nonull(1, 2);
 
 /**

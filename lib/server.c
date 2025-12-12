@@ -3,34 +3,39 @@
  *
  * This file is part of hed.
  ******************************************************************************/
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
 
 #include "hed/server.h"
 
+#include <utils/signal.h>
+#include <utils/timer.h>
 
 static int
 hed_srv_dispatch_sigchan(struct upoll_worker * work,
                          uint32_t              state __unused,
                          const struct upoll *  poll __unused)
 {
-	hed_assert(work);
-	hed_assert(state);
-	hed_assert(!(state & EPOLLOUT));
-	hed_assert(!(state & EPOLLRDHUP));
-	hed_assert(!(state & EPOLLPRI));
-	hed_assert(!(state & EPOLLHUP));
-	hed_assert(!(state & EPOLLERR));
-	hed_assert(state & EPOLLIN);
-	hed_assert(poll);
+	hed_assert_intern(work);
+	hed_assert_intern(state);
+	hed_assert_intern(!(state & EPOLLOUT));
+	hed_assert_intern(!(state & EPOLLRDHUP));
+	hed_assert_intern(!(state & EPOLLPRI));
+	hed_assert_intern(!(state & EPOLLHUP));
+	hed_assert_intern(!(state & EPOLLERR));
+	hed_assert_intern(state & EPOLLIN);
+	hed_assert_intern(poll);
 
 	const struct hed_server * srv;
 	struct signalfd_siginfo   info;
 	int                       ret;
 
-	srv = containerof(work, struct hed_server, sig_work);
-	hed_assert(chan);
+	srv = containerof(work, struct hed_server, sig_worker);
+	hed_assert_intern(srv);
 
 	ret = usig_read_fd(srv->sig_fd, &info, 1);
-	hed_assert(ret);
+	hed_assert_intern(ret);
 	if (ret < 0)
 		return (ret == -EAGAIN) ? 0 : ret;
 
@@ -48,7 +53,7 @@ hed_srv_dispatch_sigchan(struct upoll_worker * work,
 		return 0;
 
 	default:
-		galvsmpl_assert(0);
+		hed_assert_intern(0);
 	}
 
 	return ret;
@@ -57,7 +62,7 @@ hed_srv_dispatch_sigchan(struct upoll_worker * work,
 static int  __hed_nonull(1)
 hed_srv_open_sigchan(struct hed_server *srv)
 {
-	hed_assert(srv);
+	hed_assert_intern(srv);
 
 	sigset_t     msk = *usig_empty_msk;
 	sigset_t     blk = *usig_full_msk;
@@ -73,8 +78,8 @@ hed_srv_open_sigchan(struct hed_server *srv)
 	if (srv->sig_fd < 0)
 		return srv->sig_fd;
 
-	srv->sig_work.dispatch = hed_srv_dispatch_sigchan;
-	err = upoll_register(&srv->poll, srv->sig_fd, EPOLLIN, &srv->sig_work);
+	srv->sig_worker.dispatch = hed_srv_dispatch_sigchan;
+	err = upoll_register(&srv->poll, srv->sig_fd, EPOLLIN, &srv->sig_worker);
 	if (err)
 		goto close;
 
@@ -92,10 +97,10 @@ close:
 	return err;
 }
 
-static int  __hed_nonull(1)
+static void  __hed_nonull(1)
 hed_srv_close_sigchan(struct hed_server *srv)
 {
-	hed_assert(srv);
+	hed_assert_api(srv);
 
 	upoll_unregister(&srv->poll, srv->sig_fd);
 	usig_close_fd(srv->sig_fd);
@@ -107,16 +112,16 @@ hed_srv_init(struct hed_server                *srv,
              char                             *path,
              const struct hed_rpc_accept_conf *conf)
 {
-	hed_assert(srv);
-	hed_assert(path);
-	hed_assert(conf);
+	hed_assert_api(srv);
+	hed_assert_api(path);
+	hed_assert_api(conf);
 
 	int ret;
-	struct galv_unix_adopt_conf unix_conf = \
-		GALV_UNIX_ADOPT_CONF(SOCK_STREAM, SOCK_CLOEXEC,
-		                     path, CONFIG_HED_CONN_NR);
+	struct galv_unix_adopt_conf unix_conf;
 
-	galv_repo_init(&srv->repo, CONFIG_HED_CONN_NR)
+	galv_unix_adopt_config(&unix_conf, SOCK_STREAM, SOCK_CLOEXEC,
+	                       path, CONFIG_HED_CONN_NR);
+	galv_repo_init(&srv->repo, CONFIG_HED_CONN_NR);
  
 	ret = galv_unix_adopt_open(&srv->adopt, GALV_GATE_DUMMY, &unix_conf);
 	if (ret)
@@ -126,8 +131,9 @@ hed_srv_init(struct hed_server                *srv,
 	if (ret)
 		goto close_adopt;
 
-	ret = hed_rpc_open_accept(&srv->accept, &srv->repo, &srv->adopt
-				  &srv->poll, conf);
+	ret = hed_rpc_open_accept(&srv->accept, &srv->repo,
+	                          (struct galv_adopt *)&srv->adopt,
+	                          &srv->poll, conf);
 	if (ret)
 		goto close_poll;
 
@@ -137,7 +143,7 @@ hed_srv_init(struct hed_server                *srv,
 	
 	hed_srv_close_sigchan(srv);
 close_poll:
-	upoll_close(&srv->upoll);
+	upoll_close(&srv->poll);
 close_adopt:
 	galv_unix_adopt_close(&srv->adopt);
 fini:
@@ -148,7 +154,7 @@ fini:
 int __hed_nonull(1)
 hed_srv_run(struct hed_server *srv)
 {
-	hed_assert(srv);
+	hed_assert_api(srv);
 
 	int ret;
 	int tmout;
@@ -156,7 +162,7 @@ hed_srv_run(struct hed_server *srv)
 	do {
 		tmout = etux_timer_issue_msec();
 
-		ret = upoll_wait(&health_s->poll, tmout);
+		ret = upoll_wait(&srv->poll, tmout);
 		if ((ret == -ETIME) || !tmout) {
 			/* Expire timers. */
 			etux_timer_run();
@@ -180,19 +186,18 @@ hed_srv_run(struct hed_server *srv)
 int __hed_nonull(1)
 hed_srv_halt(struct hed_server *srv)
 {
-	hed_assert(srv);
+	hed_assert_api(srv);
 
 	int ret;
 
-	galv_accept_suspend((struct galv_accept *)&srv->accept, &srv->poller);
+	galv_accept_suspend((struct galv_accept *)&srv->accept, &srv->poll);
 	galv_conn_repo_halt(&srv->repo, &srv->poll);
-	err = 0;
 	while (!galv_repo_empty(&srv->repo)) {
 		/*
 		 * To be safe, a timer should be armed here to prevent from
 		 * blocking into epoll_wait() forever...
 		 */
-		ret = upoll_process(srv->poll, -1);
+		ret = upoll_process(&srv->poll, -1);
 		if (ret)
 			break;
 	}
@@ -207,11 +212,11 @@ hed_srv_halt(struct hed_server *srv)
 void __hed_nonull(1)
 hed_srv_fini(struct hed_server *srv)
 {
-	hed_assert(srv);
+	hed_assert_api(srv);
 
 	hed_srv_close_sigchan(srv);
-	galv_sess_close_accept(&srv->accept, &srv->poll);
-	upoll_close(&srv->upoll);
+	hed_rpc_close_accept(&srv->accept, &srv->poll);
+	upoll_close(&srv->poll);
 	galv_unix_adopt_close(&srv->adopt);
 	galv_repo_fini(&srv->repo);
 }

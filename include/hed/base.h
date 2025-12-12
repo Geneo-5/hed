@@ -66,8 +66,8 @@
  * @retval -EINVAL Invalid value
  */
 extern int
-hed_check_name(struct stroll_lvstr * value)
-__hed_nonull(1) __warn_result ;
+hed_chk_name(const struct stroll_lvstr * value)
+	__hed_nonull(1) __warn_result ;
 
 /**
  * Decode a struct stroll_lvstr encoded according to the MessagePack format
@@ -96,7 +96,7 @@ __hed_nonull(1) __warn_result ;
  * - dpack_decoder_init_skip_buffer()
  */
 static inline int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_decode_name(struct dpack_decoder * decoder,
+hed_dec_name(struct dpack_decoder * decoder,
 	  struct stroll_lvstr * __restrict value)
 {
 	hed_assert(decoder);
@@ -108,7 +108,7 @@ hed_decode_name(struct dpack_decoder * decoder,
 	if (ret < 0)
 		return (int)ret;
 
-	return hed_check_name(value);
+	return hed_chk_name(value);
 };
 
 /**
@@ -133,11 +133,11 @@ hed_decode_name(struct dpack_decoder * decoder,
  * - dpack_encoder_init_buffer()
  */
 static inline int __hed_nonull(1, 2) __nothrow __warn_result 
-hed_encode_name(struct dpack_encoder * encoder,
+hed_enc_name(struct dpack_encoder * encoder,
 	  const struct stroll_lvstr * value)
 {
 	hed_assert(encoder);
-	hed_assert(hed_check_name(value) == 0);
+	hed_assert(hed_chk_name(value) == 0);
 
 	return dpack_encode_lvstr(encoder, value);
 };
@@ -168,7 +168,7 @@ hed_encode_name(struct dpack_encoder * encoder,
  * - dpack_decoder_init_skip_buffer()
  */
 extern struct json_object *
-hed_decode_name_to_json(struct dpack_decoder * decoder)
+hed_dec_name_to_json(struct dpack_decoder * decoder)
 __hed_nonull(1) __nothrow __warn_result ;
 
 /**
@@ -194,7 +194,7 @@ __hed_nonull(1) __nothrow __warn_result ;
  * - dpack_encoder_init_buffer()
  */
 extern int
-hed_encode_name_from_json(struct dpack_encoder * encoder,
+hed_enc_name_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 

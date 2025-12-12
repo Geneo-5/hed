@@ -8,7 +8,7 @@
 #define _HED_RPC_H
 
 #include <hed/cdefs.h>
-#include <hed/codec.h>
+#include <galv/repo.h>
 #include <galv/session.h>
 
 struct hed_rpc_msg {
@@ -21,19 +21,19 @@ typedef int hed_rpc_fn(struct hed_rpc_msg * msg);
 
 struct hed_rpc_conn {
 	struct galv_sess_conn super; /* first */
-	const size_t rcp_nb;
-	hed_rpc_fn * const rpc;
+	const size_t rpc_nb;
+	hed_rpc_fn * const * const rpc;
 };
 
 
 static inline struct hed_rpc_msg * __hed_nonull(1)
-hed_rpc_alloc_req(struct hed_rpc_conn * conn, void * ctx)
+hed_rpc_create_request(struct hed_rpc_conn * conn, void * ctx)
 {
-	brg_rpc_assert(conn);
+	hed_assert_api(conn);
 
 	struct hed_rpc_msg *msg;
 
-	msg = glav_sess_alloc_req(&conn->super);
+	msg =(struct hed_rpc_msg *)galv_sess_create_request(&conn->super);
 	if (!msg)
 		return NULL;
 
@@ -42,19 +42,69 @@ hed_rpc_alloc_req(struct hed_rpc_conn * conn, void * ctx)
 }
 
 static inline struct hed_rpc_msg * __hed_nonull(1)
-hed_rpc_alloc_ntfy(struct hed_rpc_conn * conn)
+hed_rpc_create_notif(struct hed_rpc_conn * conn)
 {
-	brg_rpc_assert(conn);
+	hed_assert_api(conn);
 
-	return glav_sess_alloc_ntfy(&conn->super);
+	return (struct hed_rpc_msg *)galv_sess_create_notif(&conn->super);
 }
 
+static inline void __hed_nonull(1)
+hed_rpc_make_reply(struct hed_rpc_msg * msg)
+{
+	hed_assert_api(msg);
+
+	galv_sess_make_reply(&msg->super);
+}
+
+static inline void __hed_nonull(1)
+hed_rpc_push_msg(struct hed_rpc_msg *msg)
+{
+	hed_assert_api(msg);
+
+	galv_sess_push_msg(&msg->super);
+}
 
 static inline void __hed_nonull(1)
 hed_rpc_drop_msg(struct hed_rpc_msg *msg)
 {
-	glav_sess_drop_msg(&msg->super);
+	hed_assert_api(msg);
+
+	galv_sess_drop_msg(&msg->super);
 }
+
+static inline bool __hed_nonull(1)
+hed_rpc_may_pull_msg(const struct hed_rpc_conn * conn)
+{
+	hed_assert_api(conn);
+
+	return galv_sess_may_pull_msg(&conn->super);
+}
+
+static inline struct hed_rpc_msg * __hed_nonull(1)
+hed_rpc_pull_msg(struct hed_rpc_conn * conn)
+{
+	hed_assert_api(conn);
+
+	return (struct hed_rpc_msg *)galv_sess_pull_msg(&conn->super);
+}
+
+static inline size_t __hed_nonull(1)
+hed_rpc_msg_size(const struct hed_rpc_msg * msg)
+{
+	hed_assert_api(msg);
+
+	return galv_sess_msg_size(&msg->super);
+}
+
+static inline  enum galv_sess_head_type __hed_nonull(1)
+hed_rpc_msg_type(const struct hed_rpc_msg * msg)
+{
+	hed_assert_api(msg);
+
+	return galv_sess_msg_type(&msg->super);
+}
+
 
 struct hed_rpc_auth {
 	uint32_t id;
@@ -63,9 +113,9 @@ struct hed_rpc_auth {
 };
 
 struct hed_rpc_accept {
-	struct glav_sess_accept super; /* first */
+	struct galv_sess_accept super; /* first */
 	const uint32_t id_max;
-	const unsigned int rcp_nb;
+	const unsigned int rpc_nb;
 	const struct hed_rpc_auth * const rpc;
 };
 
@@ -73,7 +123,7 @@ struct hed_rpc_accept_conf {
 	struct galv_sess_accept_conf super;
 	uint32_t id_max;
 	unsigned int rpc_nb;
-	const struct hed_sess_rpc_fn * rpc;
+	struct hed_rpc_auth * const rpc;
 };
 
 #define HED_RPC_ACCEPT_CONF(_backlog, _conn_flags, _max_pload, _buff_capa, \
@@ -88,10 +138,20 @@ struct hed_rpc_accept_conf {
 
 extern int
 hed_rpc_open_accept(struct hed_rpc_accept            * acceptor,
-                    struct glav_repo                 * repository,
+                    struct galv_repo                 * repository,
                     struct galv_adopt                * adopter,
                     const struct upoll               * poller,
                     const struct hed_rpc_accept_conf * conf)
 	__hed_nonull(1, 2, 3, 4, 5);
+
+static inline void
+hed_rpc_close_accept(struct hed_rpc_accept * acceptor,
+                     const struct upoll    * poller)
+{
+	hed_assert_api(acceptor);
+	hed_assert_api(poller);
+
+	galv_sess_close_accept(&acceptor->super, poller);
+}
 
 #endif /* _HED_RPC_H */

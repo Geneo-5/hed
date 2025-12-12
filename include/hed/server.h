@@ -10,6 +10,7 @@
 #include <hed/cdefs.h>
 #include <hed/rpc.h>
 #include <galv/session.h>
+#include <galv/unix.h>
 
 struct hed_server {
 	struct hed_rpc_accept             accept;
@@ -41,7 +42,7 @@ hed_srv_fini(struct hed_server *srv)
 static inline struct upoll * __hed_nonull(1)
 hed_srv_get_upoll(struct hed_server *srv)
 {
-	hed_assert(srv);
+	hed_assert_api(srv);
 
 	return &srv->poll;
 }
