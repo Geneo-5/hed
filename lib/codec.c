@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 #include "hed/codec.h"
-#include "utils/cdefs.h"
+#include "stroll/page.h"
 
 static size_t __hed_nonull(1, 2)
 hed_reader_fill(mpack_reader_t * reader, char * buffer, size_t count)
@@ -98,7 +98,7 @@ hed_decoder_init(struct dpack_decoder * decoder,
 	hed_assert_api(decoder);
 	hed_assert_api(msg);
 
-	size_t capacity = usys_page_size();
+	size_t capacity = stroll_page_size();
 	char * buffer = malloc(capacity);
 
 	if (!buffer) {
@@ -159,7 +159,7 @@ hed_encoder_init(struct dpack_encoder * encoder,
 	hed_assert_api(encoder);
 	hed_assert_api(msg);
 
-	size_t capacity = usys_page_size();
+	size_t capacity = stroll_page_size();
 	char * buffer = malloc(capacity);
 
 	if (!buffer) {
