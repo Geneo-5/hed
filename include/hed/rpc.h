@@ -131,7 +131,7 @@ struct hed_rpc_accept_conf {
 	{ \
 		.super = GALV_SESS_ACCEPT_CONF(_backlog, _conn_flags, \
 		                               _max_pload, _buff_capa), \
-		.id_max = id_max, \
+		.id_max = _id_max, \
 		.rpc_nb = _rpc_nb, \
 		.rpc = _rpc, \
 	}

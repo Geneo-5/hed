@@ -13,15 +13,10 @@ common-cflags         := -Wall \
                          -Wcast-qual \
                          -Wcast-align \
                          -Wmissing-declarations \
-                         -fvisibility=hidden \
                          -D_GNU_SOURCE \
                          -iquote $(TOPDIR)/include \
                          -I $(TOPDIR)/include \
                          $(EXTRA_CFLAGS)
-
-common-ldflags        := $(common-cflags) \
-                         $(EXTRA_LDFLAGS) \
-                         -Wl,-z,start-stop-visibility=hidden
 
 ifeq ($(CONFIG_HED_UTEST)$(CONFIG_HED_ASSERT_API),yy)
 # When unit testsuite is required to be built, make sure to enable ELF semantic
@@ -38,15 +33,20 @@ ifneq ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 common-cflags         := $(filter-out -DNDEBUG,$(common-cflags))
 endif # ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 
-shared-common-cflags  := $(filter-out -fpie -fPIE,$(common-cflags)) -fpic
-
-shared-common-ldflags := $(filter-out -pie -fpie -fPIE,$(common-ldflags)) \
-                         -shared -Bsymbolic -fpic
+common-ldflags        := $(common-cflags) \
+                         $(EXTRA_LDFLAGS) \
+                         -Wl,-z,start-stop-visibility=hidden
 
 ifneq ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 common-ldflags        := $(filter-out -DNDEBUG,$(common-ldflags))
 endif # ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 
-common-pkgconf        := libutils libstroll libdpack $(call kconf_enabled,HED_TROER,json-c)
+shared-common-cflags  := $(filter-out -fpie -fPIE,$(common-cflags)) -fpic
+
+shared-common-ldflags := $(filter-out -pie -fpie -fPIE,$(common-ldflags)) \
+                         -shared -Bsymbolic -fpic
+
+common-pkgconf        := libstroll libdpack libgalv
+common-pkgconf        += $(call kconf_enabled,HED_TROER,json-c)
 
 # ex: filetype=make :

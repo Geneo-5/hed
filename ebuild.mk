@@ -29,8 +29,8 @@ includedir=$${prefix}/include
 Name: libhed
 Description: Hed library
 Version: $(VERSION)
-Requires: libutils libstroll libgalv libdpack $(call kconf_enabled,HED_TROER,json-c)
-Requires.private: libutils libstroll libgalv libdpack $(call kconf_enabled,HED_TROER,json-c)
+Requires: libstroll libgalv libdpack $(call kconf_enabled,HED_TROER,json-c)
+Requires.private: libstroll libgalv libdpack $(call kconf_enabled,HED_TROER,json-c)
 Cflags: -I$${includedir}
 Libs: -L$${libdir} -Wl,--push-state,--as-needed -lhed -Wl,--pop-state
 endef

@@ -12,38 +12,20 @@ hed_chk_name(const struct stroll_lvstr * value)
 {
 	hed_assert(value);
 
-	pcre2_code *re;
-	pcre2_match_data *match_data;
-	int err;
-	int errornumber;
-	PCRE2_SIZE erroroffset;
+	regex_t regex;
+	int ret;
 
 	if (40 < stroll_lvstr_len(value))
 		return -EINVAL;
 
-	re = pcre2_compile((PCRE2_SPTR)"[a-zA-Z][a-zA-Z0-9_]*",
-			   PCRE2_ZERO_TERMINATED,
-			   0,
-			   &errornumber,
-			   &erroroffset,
-			   NULL);
-	hed_assert(re);
-	if (!re)
-		return -EAGAIN;
+	ret = regcomp(&regex, "[a-zA-Z][a-zA-Z0-9_]*", REG_EXTENDED | REG_NOSUB);
+	if (ret)
+		return -ret;
 
-	match_data = pcre2_match_data_create_from_pattern(re, NULL);
-	err = pcre2_match(re,
-			  (PCRE2_SPTR)stroll_lvstr_cstr(value),
-			  PCRE2_ZERO_TERMINATED,
-			  0,
-			  PCRE2_ANCHORED | PCRE2_ENDANCHORED,
-			  match_data,
-			  NULL);
-	pcre2_code_free(re);
-	pcre2_match_data_free(match_data);
-	if (err < 0)
+	ret = regexec(&regex, stroll_lvstr_cstr(value), 0, NULL, 0);
+	regfree(&regex);
+	if (!ret)
 		return -EINVAL;
-
 	return 0;
 }
 

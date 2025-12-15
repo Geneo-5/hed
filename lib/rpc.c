@@ -86,7 +86,7 @@ hed_rpc_open_accept(struct hed_rpc_accept            * acceptor,
 STROLL_IGNORE_WARN("-Wcast-qual")
 	*(uint32_t *)&acceptor->id_max = conf->id_max;
 	*(unsigned int *)&acceptor->rpc_nb = conf->rpc_nb;
-	*(struct hed_rpc_auth **)&acceptor->rpc = conf->rpc;
+	*(struct hed_rpc_auth ** const )&acceptor->rpc = conf->rpc;
 STROLL_RESTORE_WARN
 	return 0;
 }

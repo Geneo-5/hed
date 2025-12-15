@@ -8,14 +8,13 @@
 #ifndef _BASE_H
 #define _BASE_H
 
-#define PCRE2_CODE_UNIT_WIDTH 8
 
 #include <dpack/codec.h>
 #include <dpack/lvstr.h>
 #include <errno.h>
 #include <hed/priv/config.h>
 #include <json-c/json_object.h>
-#include <pcre2.h>
+#include <regex.h>
 #include <stroll/cdefs.h>
 
 /**
