@@ -28,6 +28,10 @@ hed_srv_init(struct hed_server                *srv,
 	__hed_nonull(1, 2, 3);
 
 extern int
+hed_srv_process(struct hed_server *srv)
+	__hed_nonull(1);
+
+extern int
 hed_srv_run(struct hed_server *srv)
 	__hed_nonull(1);
 

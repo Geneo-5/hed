@@ -152,26 +152,36 @@ fini:
 }
 
 int __hed_nonull(1)
-hed_srv_run(struct hed_server *srv)
+hed_srv_process(struct hed_server *srv)
 {
 	hed_assert_api(srv);
 
 	int ret;
 	int tmout;
 
+	tmout = etux_timer_issue_msec();
+	ret = upoll_wait(&srv->poll, tmout);
+	if ((ret == -ETIME) || !tmout) {
+		/* Expire timers. */
+		etux_timer_run();
+		return 0;
+	}
+
+	if (ret <= 0)
+		return ret;
+
+	return upoll_dispatch(&srv->poll, (unsigned int)ret);
+}
+
+int __hed_nonull(1)
+hed_srv_run(struct hed_server *srv)
+{
+	hed_assert_api(srv);
+
+	int ret;
+
 	do {
-		tmout = etux_timer_issue_msec();
-
-		ret = upoll_wait(&srv->poll, tmout);
-		if ((ret == -ETIME) || !tmout) {
-			/* Expire timers. */
-			etux_timer_run();
-			ret = 0;
-		}
-
-		if (ret > 0)
-			ret = upoll_dispatch(&srv->poll, (unsigned int)ret);
-		
+		ret = hed_srv_process(srv);
 	} while (!ret || (ret == -EINTR));
 	switch (ret) {
 	case -ESHUTDOWN:
