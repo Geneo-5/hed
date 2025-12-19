@@ -55,8 +55,51 @@ hed_rpc_xfer(struct galv_sess_conn * ctx)
 	return ret;
 }
 
+static int __hed_nonull(1)
+hed_rpc_connect(struct galv_sess_conn * ctx)
+{
+	hed_assert_intern(ctx);
+
+	struct hed_rpc_conn   *conn = galv_to_rpc_conn(ctx);
+	struct hed_rpc_accept *acceptor = hed_rpc_conn_acceptor(conn);
+
+STROLL_IGNORE_WARN("-Wcast-qual")
+	*(size_t *)&conn->rpc_nb = acceptor->id_max + 1;
+	*(hed_rpc_fn ***)&conn->rpc = calloc(conn->rpc_nb, sizeof(hed_rpc_fn *));
+STROLL_RESTORE_WARN
+	if (!conn->rpc)
+		return -ENOMEM;
+
+	for (unsigned int i = 0; i < acceptor->rpc_nb; i++) {
+		const struct hed_rpc_auth *auth = &acceptor->rpc[i];
+
+		// TODO: check user group
+STROLL_IGNORE_WARN("-Wcast-qual")
+		*(hed_rpc_fn **)&conn->rpc[auth->id] = auth->rpc;
+STROLL_RESTORE_WARN
+	}
+
+	galv_sess_establish(ctx);	
+	return 0;
+}
+
+static void __hed_nonull(1)
+hed_rpc_close(struct galv_sess_conn * ctx)
+{
+	hed_assert_intern(ctx);
+
+	struct hed_rpc_conn *conn = galv_to_rpc_conn(ctx);
+
+STROLL_IGNORE_WARN("-Wcast-qual")
+	free((hed_rpc_fn **)conn->rpc);
+	*(hed_rpc_fn ***)&conn->rpc = NULL;
+STROLL_RESTORE_WARN
+}
+
 static const struct galv_sess_ops hed_rpc_ops = {
-	.xfer = hed_rpc_xfer
+	.connect = hed_rpc_connect,
+	.xfer    = hed_rpc_xfer,
+	.close   = hed_rpc_close,
 };
 
 extern int __hed_nonull(1, 2, 3, 4, 5)

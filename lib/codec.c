@@ -14,32 +14,17 @@ hed_reader_fill(mpack_reader_t * reader, char * buffer, size_t count)
 	hed_assert_intern(buffer);
 
 	struct galv_sess_msg *msg = mpack_reader_context(reader);
-	const uint8_t        *data;
-	ssize_t               size;
-	size_t                ret = 0;
+	ssize_t               ret;
 
 	hed_assert_intern(msg);
 
-	while (count) {
-		size = galv_sess_msg_pull_head(msg, &data, count);
-		if (size <= 0) {
-			if ((size == -ENODATA) && (ret))
-				return ret;
-
-			mpack_reader_flag_error(reader, mpack_error_eof);
-			return 0;
-		}
-
-		hed_assert_intern(data);
-		hed_assert_intern((size_t)size <= count);
-
-		memcpy(buffer, data, (size_t)size);
-		count  -= (size_t)size;
-		buffer += (size_t)size;
-		ret    += (size_t)size;
+	ret = galv_sess_msg_read(msg, (uint8_t *)buffer, count);
+	if (ret <= 0) {
+		hed_assert_intern(ret == -ENODATA);
+		mpack_reader_flag_error(reader, mpack_error_eof);
+		return 0;
 	}
-
-	return ret;
+	return (size_t)ret;
 }
 
 static void __hed_nonull(1)
@@ -56,7 +41,7 @@ hed_reader_skip(mpack_reader_t * reader, size_t count)
 	while (count) {
 		size = galv_sess_msg_pull_head(msg, &data, count);
 		if (size <= 0) {
-			mpack_reader_flag_error(reader, mpack_error_io);
+			mpack_reader_flag_error(reader, mpack_error_eof);
 			return;
 		}
 
@@ -121,24 +106,22 @@ hed_writer_flush(mpack_writer_t * writer, const char * buffer, size_t count)
 	hed_assert_intern(buffer);
 
 	struct galv_sess_msg *msg = mpack_writer_context(writer);
-	uint8_t              *data;
-	ssize_t               size;
+	int ret;
 
 	hed_assert_intern(msg);
 
-	while (count) {
-		size = galv_sess_msg_push_tail(msg, &data, count);
-		if (size <= 0) {
-			mpack_writer_flag_error(writer, mpack_error_io);
-			return;
-		}
-
-		hed_assert_intern(data);
-		hed_assert_intern((size_t)size <= count);
-
-		memcpy(data, buffer, (size_t)size);
-		count  -= (size_t)size;
-		buffer += (size_t)size;
+	ret = galv_sess_msg_write(msg, (const uint8_t *)buffer, count);
+	switch (ret) {
+	case 0:
+		// normal case
+		break;
+	case -ENOBUFS:
+	case -ENOMEM:
+		mpack_writer_flag_error(writer, mpack_error_memory);
+		break;
+	default:
+		hed_assert_intern(0);
+		mpack_writer_flag_error(writer, mpack_error_io);
 	}
 }
 

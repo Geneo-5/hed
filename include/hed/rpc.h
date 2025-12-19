@@ -24,7 +24,7 @@ struct hed_rpc_conn {
 	const size_t rpc_nb;
 	hed_rpc_fn * const * const rpc;
 };
-
+#define galv_to_rpc_conn(_conn) containerof(_conn, struct hed_rpc_conn, super)
 
 static inline struct hed_rpc_msg * __hed_nonull(1)
 hed_rpc_create_request(struct hed_rpc_conn * conn, void * ctx)
@@ -126,11 +126,22 @@ struct hed_rpc_accept_conf {
 	struct hed_rpc_auth * const rpc;
 };
 
+static inline struct hed_rpc_accept *
+hed_rpc_conn_acceptor(const struct hed_rpc_conn * __restrict session)
+{
+	hed_assert_api(session);
+
+	return (struct hed_rpc_accept *)galv_sess_conn_acceptor(&session->super);
+}
+
 #define HED_RPC_ACCEPT_CONF(_backlog, _conn_flags, _max_pload, _buff_capa, \
                             _id_max, _rpc_nb, _rpc) \
 	{ \
 		.super = GALV_SESS_ACCEPT_CONF(_backlog, _conn_flags, \
-		                               _max_pload, _buff_capa), \
+		                               _max_pload, \
+		                               sizeof(struct hed_rpc_msg), \
+		                               _buff_capa, \
+		                               sizeof(struct hed_rpc_conn)), \
 		.id_max = _id_max, \
 		.rpc_nb = _rpc_nb, \
 		.rpc = _rpc, \
