@@ -26,33 +26,29 @@ hed_rpc_xfer(struct galv_sess_conn * ctx)
 		hed_decoder_init(&decoder, msg);
 		ret = dpack_decode_uint32(&decoder, &id);
 		hed_decoder_fini(&decoder);
-		if (ret) {
-			hed_rpc_drop_msg(msg);
-			break;
-		}
+		if (ret)
+			goto error;
 
 		if (hed_rpc_msg_type(msg) == GALV_SESS_HEAD_REPLY_TYPE) {
-			if (msg->id != id) {
-				ret = -EINVAL;
-				hed_rpc_drop_msg(msg);
-				break;
-			}
+			if (msg->id != id)
+				goto error;
 
 		} else {
 			msg->id = id;
 		}
 
-		if ((msg->id >= conn->rpc_nb) || !conn->rpc[msg->id]) {
-			ret = -EPERM;
-			hed_rpc_drop_msg(msg);
-			break;
-		}
+		if ((msg->id >= conn->rpc_nb) || !conn->rpc[msg->id])
+			goto error;
 
 		ret = conn->rpc[msg->id](msg);
 		if (ret)
-			break;
+			goto error;
 	}
-	return ret;
+	return 0;
+error:
+	hed_rpc_drop_msg(msg);
+	// TODO Close connection
+	return 0;
 }
 
 static int __hed_nonull(1)

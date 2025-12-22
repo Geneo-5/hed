@@ -49,20 +49,20 @@ hed_rpc_create_notif(struct hed_rpc_conn * conn)
 	return (struct hed_rpc_msg *)galv_sess_create_notif(&conn->super);
 }
 
-static inline void __hed_nonull(1)
+static inline int __hed_nonull(1)
 hed_rpc_make_reply(struct hed_rpc_msg * msg)
 {
 	hed_assert_api(msg);
 
-	galv_sess_make_reply(&msg->super);
+	return galv_sess_make_reply(&msg->super);
 }
 
-static inline void __hed_nonull(1)
+static inline int __hed_nonull(1)
 hed_rpc_push_msg(struct hed_rpc_msg *msg)
 {
 	hed_assert_api(msg);
 
-	galv_sess_push_msg(&msg->super);
+	return galv_sess_push_msg(&msg->super);
 }
 
 static inline void __hed_nonull(1)
