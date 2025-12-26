@@ -49,6 +49,36 @@ hed_rpc_create_notif(struct hed_rpc_conn * conn)
 	return (struct hed_rpc_msg *)galv_sess_create_notif(&conn->super);
 }
 
+static inline void __hed_nonull(1)
+hed_rpc_msg_set_id(struct hed_rpc_msg * msg, uint32_t id)
+{
+	hed_assert_api(msg);
+
+	msg->id = id;
+}
+
+static inline void * __hed_nonull(1)
+hed_rpc_msg_get_ctx(const struct hed_rpc_msg * msg)
+{
+	hed_assert_api(msg);
+
+	return msg->ctx;
+}
+
+static inline struct hed_rpc_msg * __hed_nonull(1)
+hed_rpc_alloc_req(struct hed_rpc_conn *conn, void *ctx)
+{
+	hed_assert_api(conn);
+
+	struct hed_rpc_msg * msg;
+
+	msg = (struct hed_rpc_msg *)galv_sess_create_request(&conn->super);
+	if (msg)
+		msg->ctx = ctx;
+
+	return msg;
+}
+
 static inline int __hed_nonull(1)
 hed_rpc_make_reply(struct hed_rpc_msg * msg)
 {
@@ -164,5 +194,10 @@ hed_rpc_close_accept(struct hed_rpc_accept * acceptor,
 
 	galv_sess_close_accept(&acceptor->super, poller);
 }
+
+struct hed_rpc_connect_conf {
+};
+
+#define HED_RPC_CONNECT_CONF(...) {}
 
 #endif /* _HED_RPC_H */
