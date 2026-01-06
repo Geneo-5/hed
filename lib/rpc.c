@@ -5,7 +5,6 @@
  ******************************************************************************/
 
 #include "hed/rpc.h"
-#include "hed/codec.h"
 #include <dpack/scalar.h>
 
 static int __hed_nonull(1)
@@ -25,26 +24,27 @@ hed_rpc_xfer(struct galv_sess_conn * ctx)
 
 		hed_decoder_init(&decoder, msg);
 		ret = dpack_decode_uint32(&decoder, &id);
-		hed_decoder_fini(&decoder);
 		if (ret)
-			goto error;
+			goto fini;
 
 		if (hed_rpc_msg_type(msg) == GALV_SESS_HEAD_REPLY_TYPE) {
 			if (msg->id != id)
-				goto error;
+				goto fini;
 
 		} else {
 			msg->id = id;
 		}
 
 		if ((msg->id >= conn->rpc_nb) || !conn->rpc[msg->id])
-			goto error;
+			goto fini;
 
-		ret = conn->rpc[msg->id](msg);
+		ret = conn->rpc[msg->id](msg, &decoder);
 		if (ret)
 			goto error;
 	}
 	return 0;
+fini:
+	hed_decoder_fini(&decoder);
 error:
 	hed_rpc_drop_msg(msg);
 	// TODO Close connection

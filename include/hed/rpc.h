@@ -8,6 +8,7 @@
 #define _HED_RPC_H
 
 #include <hed/cdefs.h>
+#include <hed/codec.h>
 #include <galv/repo.h>
 #include <galv/session.h>
 
@@ -17,7 +18,7 @@ struct hed_rpc_msg {
 	void * ctx;
 };
 
-typedef int hed_rpc_fn(struct hed_rpc_msg * msg);
+typedef int hed_rpc_fn(struct hed_rpc_msg * msg, struct dpack_decoder *decoder);
 
 struct hed_rpc_conn {
 	struct galv_sess_conn super; /* first */

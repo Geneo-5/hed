@@ -7,19 +7,6 @@
 #include "hed/codec.h"
 #include "stroll/page.h"
 
-struct galv_frag {
-	struct stroll_buff       base;
-	struct stroll_slist_node list;
-	struct galv_buff *       buff;
-};
-
-static inline
-struct galv_frag *
-galv_frag_list_first(const struct galv_frag_list * __restrict list)
-{
-	return stroll_slist_first_entry(&list->base, struct galv_frag, list);
-}
-
 struct reader_ctx {
 	struct galv_sess_msg *msg;
 	size_t                last_size;
@@ -30,12 +17,10 @@ hed_reader_skip(mpack_reader_t * reader, size_t count)
 {
 	hed_assert_intern(reader);
 
-	struct reader_ctx    *ctx = mpack_reader_context(reader);
-	struct galv_sess_msg *msg = ctx->msg;
+	struct galv_sess_msg *msg = mpack_reader_context(reader);
 	const uint8_t        *data;
 	ssize_t               size;
 
-	hed_assert_intern(ctx);
 	hed_assert_intern(msg);
 
 	while (count) {
@@ -58,26 +43,10 @@ hed_reader_fill(mpack_reader_t * reader, char * buffer, size_t count)
 	hed_assert_intern(reader);
 	hed_assert_intern(buffer);
 
-	struct reader_ctx    *ctx = mpack_reader_context(reader);
-	struct galv_sess_msg *msg = ctx->msg;
-	struct galv_frag     *frag;
-	const uint8_t        *data;
+	struct galv_sess_msg *msg = mpack_reader_context(reader);
+	ssize_t               ret;
 
-	hed_assert_intern(ctx);
 	hed_assert_intern(msg);
-
-	if (ctx->last_size) {
-		hed_reader_skip(reader, ctx->last_size);
-		ctx->last_size = 0;
-	}
-
-	frag = galv_frag_list_first(&msg->recv.frags);
-	ctx->last_size = stroll_min(stroll_buff_busy(&frag->base), count);
-	data = stroll_buff_data(&frag->base, galv_buff_mem(frag->buff));
-	memcpy(buffer, data, ctx->last_size);
-	return ctx->last_size;
-
-#if 0
 	ret = galv_sess_msg_read(msg, (uint8_t *)buffer, count);
 	if (ret <= 0) {
 		hed_assert_intern(ret == -ENODATA);
@@ -85,7 +54,6 @@ hed_reader_fill(mpack_reader_t * reader, char * buffer, size_t count)
 		return 0;
 	}
 	return (size_t)ret;
-#endif
 }
 
 
@@ -94,14 +62,6 @@ hed_reader_teardown(mpack_reader_t * reader)
 {
 	hed_assert_intern(reader);
 
-	struct reader_ctx *ctx = mpack_reader_context(reader);
-	unsigned int skip = ctx->last_size - (unsigned int)(reader->end - reader->data);
-
-	hed_assert_intern(ctx);
-
-	hed_reader_skip(reader, skip);
-
-	free(ctx);
 	free(reader->buffer);
 	reader->buffer = NULL;
 	reader->context = NULL;
@@ -130,20 +90,14 @@ hed_decoder_init(struct dpack_decoder * decoder,
 
 	size_t capacity = stroll_page_size();
 	char * buffer = malloc(capacity);
-	struct reader_ctx *ctx = malloc(sizeof(*ctx));
 
-	if (!buffer || !ctx) {
+	if (!buffer) {
 		mpack_reader_init_error(&decoder->mpack, mpack_error_memory);
-		free(buffer);
-		free(ctx);
 		return;
 	}
 
-	ctx->msg = &msg->super;
-	ctx->last_size = 0;
-
 	mpack_reader_init(&decoder->mpack, buffer, capacity, 0);
-	mpack_reader_set_context(&decoder->mpack, ctx);
+	mpack_reader_set_context(&decoder->mpack, &msg->super);
 	mpack_reader_set_fill(&decoder->mpack, hed_reader_fill);
 	mpack_reader_set_skip(&decoder->mpack, hed_reader_skip);
 	mpack_reader_set_teardown(&decoder->mpack, hed_reader_teardown);
