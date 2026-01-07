@@ -18,11 +18,11 @@ hed_chk_name(const struct stroll_lvstr * value)
 	if (40 < stroll_lvstr_len(value))
 		return -EINVAL;
 
-	ret = regcomp(&regex, "[a-zA-Z][a-zA-Z0-9_]*", REG_EXTENDED | REG_NOSUB);
+	ret = regcomp(&regex, "^[a-zA-Z][a-zA-Z0-9_]*$", REG_EXTENDED | REG_NOSUB);
 	if (ret)
 		return -ret;
 
-	ret = regexec(&regex, stroll_lvstr_cstr(value), 0, NULL, 0);
+	ret = regexec(&regex, stroll_lvstr_cstr(value), 0, NULL, REG_NOTBOL | REG_NOTEOL);
 	regfree(&regex);
 	if (!ret)
 		return -EINVAL;
