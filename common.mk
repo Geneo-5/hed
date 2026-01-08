@@ -35,6 +35,7 @@ endif # ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)
 
 common-ldflags        := $(common-cflags) \
                          $(EXTRA_LDFLAGS) \
+                         -l:liblmdb.a \
                          -Wl,-z,start-stop-visibility=hidden
 
 ifneq ($(filter y,$(CONFIG_HED_ASSERT_API) $(CONFIG_HED_ASSERT_INTERN)),)

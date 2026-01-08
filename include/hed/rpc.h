@@ -8,7 +8,7 @@
 #define _HED_RPC_H
 
 #include <hed/cdefs.h>
-#include <hed/codec.h>
+#include <dpack/codec.h>
 #include <galv/repo.h>
 #include <galv/session.h>
 

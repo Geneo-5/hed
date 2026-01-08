@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include "hed/rpc.h"
+#include <hed/codec.h>
 #include <dpack/scalar.h>
 
 static int __hed_nonull(1)
