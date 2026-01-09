@@ -5,65 +5,17 @@
  ******************************************************************************/
 
 #include "hed/rpc.h"
-#include <hed/codec.h>
-#include <dpack/scalar.h>
-
-static int __hed_nonull(1)
-hed_rpc_xfer(struct galv_sess_conn * ctx)
-{
-	hed_assert_intern(ctx);
-
-	struct hed_rpc_conn  *conn = (struct hed_rpc_conn *)ctx;
-	struct hed_rpc_msg   *msg;
-	struct dpack_decoder  decoder;
-	uint32_t              id;
-	int                   ret = 0;
-
-	while(hed_rpc_may_pull_msg(conn)) {
-		msg = hed_rpc_pull_msg(conn);
-		hed_assert_intern(msg);
-
-		hed_decoder_init(&decoder, msg);
-		ret = dpack_decode_uint32(&decoder, &id);
-		if (ret)
-			goto fini;
-
-		if (hed_rpc_msg_type(msg) == GALV_SESS_HEAD_REPLY_TYPE) {
-			if (msg->id != id)
-				goto fini;
-
-		} else {
-			msg->id = id;
-		}
-
-		if ((msg->id >= conn->rpc_nb) || !conn->rpc[msg->id])
-			goto fini;
-
-		ret = conn->rpc[msg->id](msg, &decoder);
-		if (ret)
-			goto error;
-	}
-	return 0;
-fini:
-	hed_decoder_fini(&decoder);
-error:
-	hed_rpc_drop_msg(msg);
-	// TODO Close connection
-	return 0;
-}
 
 static int __hed_nonull(1)
 hed_rpc_connect(struct galv_sess_conn * ctx)
 {
 	hed_assert_intern(ctx);
 
-	struct hed_rpc_conn   *conn = galv_to_rpc_conn(ctx);
+	struct galv_rpc_conn  *conn = (struct galv_rpc_conn *)ctx;
 	struct hed_rpc_accept *acceptor = hed_rpc_conn_acceptor(conn);
 
-STROLL_IGNORE_WARN("-Wcast-qual")
-	*(size_t *)&conn->rpc_nb = acceptor->id_max + 1;
-	*(hed_rpc_fn ***)&conn->rpc = calloc(conn->rpc_nb, sizeof(hed_rpc_fn *));
-STROLL_RESTORE_WARN
+	conn->rpc_nb = acceptor->id_max + 1;
+	conn->rpc = calloc(conn->rpc_nb, sizeof(galv_rpc_fn *));
 	if (!conn->rpc)
 		return -ENOMEM;
 
@@ -71,9 +23,7 @@ STROLL_RESTORE_WARN
 		const struct hed_rpc_auth *auth = &acceptor->rpc[i];
 
 		// TODO: check user group
-STROLL_IGNORE_WARN("-Wcast-qual")
-		*(hed_rpc_fn **)&conn->rpc[auth->id] = auth->rpc;
-STROLL_RESTORE_WARN
+		conn->rpc[auth->id] = auth->rpc;
 	}
 
 	galv_sess_establish(ctx);	
@@ -85,17 +35,16 @@ hed_rpc_close(struct galv_sess_conn * ctx)
 {
 	hed_assert_intern(ctx);
 
-	struct hed_rpc_conn *conn = galv_to_rpc_conn(ctx);
+	struct galv_rpc_conn *conn = (struct galv_rpc_conn *)ctx;
 
-STROLL_IGNORE_WARN("-Wcast-qual")
-	free((hed_rpc_fn **)conn->rpc);
-	*(hed_rpc_fn ***)&conn->rpc = NULL;
-STROLL_RESTORE_WARN
+	free(conn->rpc);
+	conn->rpc_nb = 0;
+	conn->rpc = NULL;
 }
 
 static const struct galv_sess_ops hed_rpc_ops = {
 	.connect = hed_rpc_connect,
-	.xfer    = hed_rpc_xfer,
+	.xfer    = galv_rpc_xfer,
 	.close   = hed_rpc_close,
 };
 

@@ -10,7 +10,6 @@ config-obj      := config.o
 
 HEADERDIR       := $(CURDIR)/include
 headers         := hed/cdefs.h
-headers         += hed/codec.h
 headers         += hed/rpc.h
 headers         += hed/server.h
 headers         += hed/repo.h
