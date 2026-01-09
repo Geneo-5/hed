@@ -209,6 +209,10 @@ hed_dec_in_svc_to_json(struct dpack_decoder * decoder)
 	if (!object)
 		return NULL;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		goto error;
+
 	obj = hed_decode_in_addr_to_json(decoder);
 	if (!obj)
 		goto error;
@@ -241,6 +245,10 @@ hed_enc_in_svc_from_json(struct dpack_encoder * encoder,
 	int ret;
 	struct json_object *obj;
 	size_t nb __unused;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
@@ -276,6 +284,10 @@ hed_dec_in6_svc_to_json(struct dpack_decoder * decoder)
 	if (!object)
 		return NULL;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		goto error;
+
 	obj = hed_decode_in6_addr_to_json(decoder);
 	if (!obj)
 		goto error;
@@ -308,6 +320,10 @@ hed_enc_in6_svc_from_json(struct dpack_encoder * encoder,
 	int ret;
 	struct json_object *obj;
 	size_t nb __unused;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
@@ -343,6 +359,10 @@ hed_dec_in_net_to_json(struct dpack_decoder * decoder)
 	if (!object)
 		return NULL;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		goto error;
+
 	obj = hed_decode_in_addr_to_json(decoder);
 	if (!obj)
 		goto error;
@@ -375,6 +395,10 @@ hed_enc_in_net_from_json(struct dpack_encoder * encoder,
 	int ret;
 	struct json_object *obj;
 	size_t nb __unused;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)
@@ -410,6 +434,10 @@ hed_dec_in6_net_to_json(struct dpack_decoder * decoder)
 	if (!object)
 		return NULL;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		goto error;
+
 	obj = hed_decode_in6_addr_to_json(decoder);
 	if (!obj)
 		goto error;
@@ -442,6 +470,10 @@ hed_enc_in6_net_from_json(struct dpack_encoder * encoder,
 	int ret;
 	struct json_object *obj;
 	size_t nb __unused;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	obj = json_object_object_get(object, "addr");
 	if (!obj)

@@ -110,6 +110,10 @@ hed_dec_in_svc(struct dpack_decoder * decoder,
 
 	int ret;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		return ret;
+
 	ret = hed_decode_in_addr(decoder, &value->addr);
 	if (ret)
 		return ret;
@@ -129,6 +133,10 @@ hed_enc_in_svc(struct dpack_encoder * encoder,
 	hed_assert(hed_chk_in_svc(value) == 0);
 
 	int ret;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	ret = hed_encode_in_addr(encoder, &value->addr);
 	if (ret)
@@ -185,6 +193,10 @@ hed_dec_in6_svc(struct dpack_decoder * decoder,
 
 	int ret;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		return ret;
+
 	ret = hed_decode_in6_addr(decoder, &value->addr);
 	if (ret)
 		return ret;
@@ -204,6 +216,10 @@ hed_enc_in6_svc(struct dpack_encoder * encoder,
 	hed_assert(hed_chk_in6_svc(value) == 0);
 
 	int ret;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	ret = hed_encode_in6_addr(encoder, &value->addr);
 	if (ret)
@@ -260,6 +276,10 @@ hed_dec_in_net(struct dpack_decoder * decoder,
 
 	int ret;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		return ret;
+
 	ret = hed_decode_in_addr(decoder, &value->addr);
 	if (ret)
 		return ret;
@@ -279,6 +299,10 @@ hed_enc_in_net(struct dpack_encoder * encoder,
 	hed_assert(hed_chk_in_net(value) == 0);
 
 	int ret;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	ret = hed_encode_in_addr(encoder, &value->addr);
 	if (ret)
@@ -335,6 +359,10 @@ hed_dec_in6_net(struct dpack_decoder * decoder,
 
 	int ret;
 
+	ret = dpack_array_decode_count_equ(decoder, 2);
+	if (ret)
+		return ret;
+
 	ret = hed_decode_in6_addr(decoder, &value->addr);
 	if (ret)
 		return ret;
@@ -354,6 +382,10 @@ hed_enc_in6_net(struct dpack_encoder * encoder,
 	hed_assert(hed_chk_in6_net(value) == 0);
 
 	int ret;
+
+	ret = dpack_array_begin_encode(encoder, 2);
+	if (ret)
+		return ret;
 
 	ret = hed_encode_in6_addr(encoder, &value->addr);
 	if (ret)
