@@ -40,9 +40,9 @@ hed_decode_ether_addr(struct dpack_decoder * decoder,
 	hed_assert_api(decoder);
 	hed_assert_api(addr);
 
-	return dpack_decode_bincpy_equ(decoder,
-	                               ETH_ALEN,
-	                               (uint8_t *)addr->ether_addr_octet);
+	return (int)dpack_decode_bincpy_equ(decoder,
+	                                    ETH_ALEN,
+	                                    (uint8_t *)addr->ether_addr_octet);
 }
 
 int
@@ -217,7 +217,8 @@ hed_decode_in6_addr(struct dpack_decoder  * decoder,
 	hed_assert_api(decoder);
 	hed_assert_api(addr);
 
-	return dpack_decode_bincpy_equ(decoder, 16, (uint8_t *)addr->s6_addr);
+	return (int)dpack_decode_bincpy_equ(decoder, 16,
+	                                    (uint8_t *)addr->s6_addr);
 }
 
 int
