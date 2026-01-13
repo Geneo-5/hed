@@ -6,80 +6,50 @@
 
 #include "hed/rpc.h"
 
-static int __hed_nonull(1)
-hed_rpc_connect(struct galv_sess_conn * ctx)
+ssize_t
+hed_rpc_create(struct galv_rpc_factory * factory,
+               struct galv_rpc_conn *    rpc __unused,
+               galv_rpc_fn * * * meth)
 {
-	hed_assert_intern(ctx);
+	hed_assert_intern(factory);
+	hed_assert_intern(rpc);
+	hed_assert_intern(meth);
+	
+	struct hed_rpc_factory *auth_factory = (struct hed_rpc_factory *)factory;
+	galv_rpc_fn * * fn;
+	bool permit = false;
+	size_t nr = auth_factory->max_id + 1;
 
-	struct galv_rpc_conn  *conn = (struct galv_rpc_conn *)ctx;
-	struct hed_rpc_accept *acceptor = hed_rpc_conn_acceptor(conn);
-
-	conn->meth_nr = acceptor->id_max + 1;
-	conn->meth = calloc(conn->meth_nr, sizeof(galv_rpc_fn *));
-	if (!conn->meth)
+	fn = calloc(nr, sizeof(galv_rpc_fn *));
+	if (!fn)
 		return -ENOMEM;
 
-	for (unsigned int i = 0; i < acceptor->rpc_nb; i++) {
-		const struct hed_rpc_auth *auth = &acceptor->rpc[i];
+	for (size_t i = 0; i < auth_factory->auth_nr; i++) {
+		hed_assert_intern(i < nr);
 
-		// TODO: check user group
-STROLL_IGNORE_WARN("-Wcast-qual")
-		*(galv_rpc_fn **)&conn->meth[auth->id] = auth->rpc;
-STROLL_RESTORE_WARN
+		const struct hed_rpc_auth *auth = &auth_factory->auth[i];
+	
+		fn[auth->id] = auth->meth;
+		permit = true;
 	}
 
-	galv_sess_establish(ctx);
-	return 0;
+	if (permit) {
+		*meth = fn;
+		return (ssize_t)nr;
+	}
+
+	free(fn);
+	return -EPERM;
 }
 
-static void __hed_nonull(1)
-hed_rpc_close(struct galv_sess_conn * ctx)
+void
+hed_rpc_destroy(struct galv_rpc_factory * factory __unused,
+                struct galv_rpc_conn * rpc __unused,
+                galv_rpc_fn * * meth)
 {
-	hed_assert_intern(ctx);
+	hed_assert_intern(factory);
+	hed_assert_intern(rpc);
 
-	struct galv_rpc_conn *conn = (struct galv_rpc_conn *)ctx;
-
-STROLL_IGNORE_WARN("-Wcast-qual")
-	free((galv_rpc_fn **)conn->meth);
-STROLL_RESTORE_WARN
-	conn->meth_nr = 0;
-	conn->meth = NULL;
+	free(meth);
 }
 
-static const struct galv_sess_ops hed_rpc_ops = {
-	.connect = hed_rpc_connect,
-	.xfer    = galv_rpc_xfer,
-	.close   = hed_rpc_close,
-};
-
-extern int __hed_nonull(1, 2, 3, 4, 5)
-hed_rpc_open_accept(struct hed_rpc_accept            * acceptor,
-                    struct galv_repo                 * repository,
-                    struct galv_adopt                * adopter,
-                    const struct upoll               * poller,
-                    const struct hed_rpc_accept_conf * conf)
-{
-	hed_assert_api(acceptor);
-	hed_assert_api(repository);
-	hed_assert_api(adopter);
-	hed_assert_api(poller);
-	hed_assert_api(conf);
-
-	int ret;
-
-	ret = galv_sess_open_accept(&acceptor->super,
-	                            &hed_rpc_ops,
-	                            repository,
-	                            adopter,
-	                            poller,
-	                            &conf->super);
-	if (ret)
-		return ret;
-
-STROLL_IGNORE_WARN("-Wcast-qual")
-	*(uint32_t *)&acceptor->id_max = conf->id_max;
-	*(unsigned int *)&acceptor->rpc_nb = conf->rpc_nb;
-	*(struct hed_rpc_auth ** const )&acceptor->rpc = conf->rpc;
-STROLL_RESTORE_WARN
-	return 0;
-}

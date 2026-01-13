@@ -13,7 +13,7 @@
 #include <galv/unix.h>
 
 struct hed_server {
-	struct hed_rpc_accept             accept;
+	struct galv_rpc_accept            accept;
 	struct galv_unix_adopt            adopt;
 	struct upoll                      poll;
 	struct galv_repo                  repo;
@@ -22,9 +22,9 @@ struct hed_server {
 };
 
 extern int
-hed_srv_init(struct hed_server                *srv,
-             char                             *path,
-             const struct hed_rpc_accept_conf *conf)
+hed_srv_init(struct hed_server                 *srv,
+             char                              *path,
+             const struct galv_rpc_accept_conf *conf)
 	__hed_nonull(1, 2, 3);
 
 extern int
