@@ -7,19 +7,21 @@
 #include "hed/rpc.h"
 
 ssize_t
-hed_rpc_create(struct galv_rpc_factory * factory,
-               struct galv_rpc_conn *    rpc __unused,
-               galv_rpc_fn * * * meth)
+hed_rpc_create(const struct galv_rpc_factory * __restrict factory,
+               const struct galv_rpc_conn *    __restrict rpc __unused,
+               galv_rpc_fn * const ** meth)
 {
 	hed_assert_intern(factory);
 	hed_assert_intern(rpc);
 	hed_assert_intern(meth);
 	
-	struct hed_rpc_factory *auth_factory = (struct hed_rpc_factory *)factory;
+	const struct hed_rpc_factory * auth_factory;
 	galv_rpc_fn * * fn;
 	bool permit = false;
-	size_t nr = auth_factory->max_id + 1;
+	size_t nr;
 
+	auth_factory = (const struct hed_rpc_factory *)factory;
+	nr = auth_factory->max_id + 1;
 	fn = calloc(nr, sizeof(galv_rpc_fn *));
 	if (!fn)
 		return -ENOMEM;
@@ -43,9 +45,9 @@ hed_rpc_create(struct galv_rpc_factory * factory,
 }
 
 void
-hed_rpc_destroy(struct galv_rpc_factory * factory __unused,
-                struct galv_rpc_conn * rpc __unused,
-                galv_rpc_fn * * meth)
+hed_rpc_destroy(const struct galv_rpc_factory * __restrict factory __unused,
+                const struct galv_rpc_conn * __restrict rpc __unused,
+                galv_rpc_fn ** meth)
 {
 	hed_assert_intern(factory);
 	hed_assert_intern(rpc);

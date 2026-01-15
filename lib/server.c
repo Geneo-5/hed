@@ -110,7 +110,8 @@ hed_srv_close_sigchan(struct hed_server *srv)
 int __hed_nonull(1, 2, 3)
 hed_srv_init(struct hed_server                 *srv,
              char                              *path,
-             const struct galv_rpc_accept_conf *conf)
+             const struct galv_rpc_accept_conf *conf,
+             const struct hed_rpc_factory      *factory)
 {
 	hed_assert_api(srv);
 	hed_assert_api(path);
@@ -131,9 +132,12 @@ hed_srv_init(struct hed_server                 *srv,
 	if (ret)
 		goto close_adopt;
 
-	ret = galv_rpc_open_accept(&srv->accept, &srv->repo,
+	ret = galv_rpc_open_accept(&srv->accept,
+	                           &factory->base,
+	                           &srv->repo,
 	                           (struct galv_adopt *)&srv->adopt,
-	                           &srv->poll, conf);
+	                           &srv->poll,
+	                           conf);
 	if (ret)
 		goto close_poll;
 

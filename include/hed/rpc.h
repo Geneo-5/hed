@@ -26,15 +26,15 @@ struct hed_rpc_factory {
 };
 
 extern ssize_t
-hed_rpc_create(struct galv_rpc_factory * factory,
-               struct galv_rpc_conn *    rpc __unused,
-               galv_rpc_fn * * * meth)
+hed_rpc_create(const struct galv_rpc_factory * __restrict factory,
+               const struct galv_rpc_conn *    __restrict rpc __unused,
+               galv_rpc_fn * const ** meth)
 	__hed_nonull(1, 2, 3);
 
 extern void
-hed_rpc_destroy(struct galv_rpc_factory * factory __unused,
-                struct galv_rpc_conn * rpc __unused,
-                galv_rpc_fn * * meth)
+hed_rpc_destroy(const struct galv_rpc_factory * __restrict factory __unused,
+                const struct galv_rpc_conn * __restrict rpc __unused,
+                galv_rpc_fn ** meth)
 	__hed_nonull(1, 2);
 
 #define HED_RPC_FACTORY(_max, _nr, _auth) { \
