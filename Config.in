@@ -58,3 +58,9 @@ config HED_BUFF_CAPA_MAX
 	default 4096
 	help
 	  Default nb connexion in repo
+
+config HED_REPO_3PC
+	bool "Repo Three-phase commit"
+	default n
+	help
+	  Implement three-phase commit protocol in repo

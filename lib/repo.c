@@ -191,9 +191,11 @@ hed_repo_start(struct hed_repo * repo)
 	hed_assert_api(repo->env);
 	hed_assert_api(!repo->txn);
 
+	unsigned int flags = repo->flags & O_RDONLY ? MDB_RDONLY : 0;
+
+#if defined(CONFIG_HED_REPO_3PC)
 	int fd;
 	int ret;
-	unsigned int flags = repo->flags & O_RDONLY ? MDB_RDONLY : 0;
 
 	if (!flags) {
 		fd = ufile_new(stroll_lvstr_cstr(&repo->backup),
@@ -206,6 +208,7 @@ hed_repo_start(struct hed_repo * repo)
 		if (ret)
 			return ret;
 	}
+#endif
 
 	return mdb_txn_begin(repo->env, NULL, flags, &repo->txn);
 }
@@ -235,6 +238,7 @@ hed_repo_abort(struct hed_repo * repo)
 	repo->txn = NULL;
 }
 
+#if defined(CONFIG_HED_REPO_3PC)
 int __hed_nonull(1) __warn_result
 hed_repo_rollback(struct hed_repo * repo)
 {
@@ -246,6 +250,7 @@ hed_repo_rollback(struct hed_repo * repo)
 	rename(stroll_lvstr_cstr(&repo->backup), stroll_lvstr_cstr(&repo->path));
 	return repo_open(repo, repo->flags);
 }
+#endif
 
 int __hed_nonull(1, 2, 3, 5, 6) __warn_result
 hed_repo_get(struct hed_repo * repo,

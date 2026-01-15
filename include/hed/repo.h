@@ -56,9 +56,11 @@ extern int
 hed_repo_commit(struct hed_repo * repo)
 	__hed_nonull(1) __warn_result;
 
+#if defined(CONFIG_HED_REPO_3PC)
 extern int
 hed_repo_rollback(struct hed_repo * repo)
 	__hed_nonull(1) __warn_result;
+#endif
 
 extern void
 hed_repo_abort(struct hed_repo * repo)
