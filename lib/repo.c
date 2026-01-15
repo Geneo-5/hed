@@ -60,7 +60,7 @@ repo_open(struct hed_repo * repo, int flags)
 	if (ret)
 		return ret;
 
-	ret = mdb_env_set_maxdbs(repo->env, repo->nb + 1);
+	ret = mdb_env_set_maxdbs(repo->env, (MDB_dbi)(repo->nb + 1));
 	if (ret)
 		goto error;
 
@@ -398,7 +398,7 @@ hed_repo_next_seq(struct hed_repo * repo,
 	if (ret)
 		return 0;
 
-	hed_assert_api(len == sizeof(req));
+	hed_assert_api(len == sizeof(seq));
 	seq = *old + 1;
 
 	ret = hed_repo_update(repo , ".hed",

@@ -9,6 +9,7 @@
 #define _INET_H
 
 
+#include <dpack/array.h>
 #include <dpack/codec.h>
 #include <dpack/scalar.h>
 #include <errno.h>
