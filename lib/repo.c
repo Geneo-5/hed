@@ -103,7 +103,7 @@ error:
 	return ret;
 }
 
-int __hed_nonull(1, 2, 3) __warn_result
+int
 hed_repo_open(struct hed_repo    *repo,
               const char         *path,
               const char * const *table,
@@ -144,7 +144,7 @@ STROLL_RESTORE_WARN
 	ret = stroll_lvstr_init_dup(&repo->path, path);
 	if (ret)
 		goto free_backup;
-	
+
 	ret = repo_open(repo, flags);
 	if (ret)
 		goto free_path;
@@ -158,7 +158,7 @@ free_backup:
 	return ret;
 }
 
-void __hed_nonull(1)
+void
 hed_repo_close(struct hed_repo * repo)
 {
 	hed_assert_api(repo);
@@ -173,7 +173,7 @@ hed_repo_close(struct hed_repo * repo)
 	stroll_lvstr_fini(&repo->backup);
 }
 
-int __hed_nonull(1) __warn_result
+int
 hed_repo_reload(struct hed_repo * repo)
 {
 	hed_assert_api(repo);
@@ -184,7 +184,7 @@ hed_repo_reload(struct hed_repo * repo)
 	return repo_open(repo, repo->flags);
 }
 
-int __hed_nonull(1) __warn_result
+int
 hed_repo_start(struct hed_repo * repo)
 {
 	hed_assert_api(repo);
@@ -213,7 +213,7 @@ hed_repo_start(struct hed_repo * repo)
 	return mdb_txn_begin(repo->env, NULL, flags, &repo->txn);
 }
 
-int __hed_nonull(1) __warn_result
+int
 hed_repo_commit(struct hed_repo * repo)
 {
 	hed_assert_api(repo);
@@ -227,7 +227,7 @@ hed_repo_commit(struct hed_repo * repo)
 	return ret;
 }
 
-void __hed_nonull(1)
+void
 hed_repo_abort(struct hed_repo * repo)
 {
 	hed_assert_api(repo);
@@ -239,7 +239,7 @@ hed_repo_abort(struct hed_repo * repo)
 }
 
 #if defined(CONFIG_HED_REPO_3PC)
-int __hed_nonull(1) __warn_result
+int
 hed_repo_rollback(struct hed_repo * repo)
 {
 	hed_assert_api(repo);
@@ -252,7 +252,7 @@ hed_repo_rollback(struct hed_repo * repo)
 }
 #endif
 
-int __hed_nonull(1, 2, 3, 5, 6) __warn_result
+int
 hed_repo_get(struct hed_repo * repo,
              const char * table,
              const uint8_t * key,
@@ -292,7 +292,7 @@ STROLL_RESTORE_WARN
 	return 0;
 }
 
-int __hed_nonull(1, 2, 3, 5) __warn_result
+int
 hed_repo_update(struct hed_repo * repo,
                 const char * table,
                 const uint8_t * key,
@@ -330,7 +330,7 @@ STROLL_RESTORE_WARN
 }
 
 
-int __hed_nonull(1, 2, 3) __warn_result
+int
 hed_repo_del(struct hed_repo * repo,
                 const char * table,
                 const uint8_t * key,
@@ -360,7 +360,7 @@ STROLL_RESTORE_WARN
 	return mdb_del(repo->txn, dbi, &idx, NULL);
 }
 
-ssize_t __hed_nonull(1, 2) __warn_result
+ssize_t
 hed_repo_count(struct hed_repo * repo,
                const char * table)
 {
@@ -384,7 +384,7 @@ hed_repo_count(struct hed_repo * repo,
 	return (ssize_t)stat.ms_entries;
 }
 
-uint32_t __hed_nonull(1, 2) __warn_result
+uint32_t
 hed_repo_next_seq(struct hed_repo * repo,
                   const char * table)
 {
@@ -415,7 +415,7 @@ hed_repo_next_seq(struct hed_repo * repo,
 	return seq;
 }
 
-struct hed_repo_iter * __hed_nonull(1, 2) __warn_result
+struct hed_repo_iter *
 hed_repo_create_iter(struct hed_repo * repo,
                      const char * table)
 {
@@ -447,7 +447,7 @@ error:
 	return NULL;
 }
 
-void __hed_nonull(1)
+void
 hed_repo_destroy_iter(struct hed_repo_iter *iter)
 {
 	hed_assert_api(iter);
@@ -457,7 +457,7 @@ hed_repo_destroy_iter(struct hed_repo_iter *iter)
 	free(iter);
 }
 
-int __hed_nonull(1) __warn_result
+int
 hed_repo_step(struct hed_repo_iter * iter,
               uint8_t * * const key,
               size_t  * klen,

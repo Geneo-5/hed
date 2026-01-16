@@ -14,7 +14,7 @@ hed_rpc_create(const struct galv_rpc_factory * __restrict factory,
 	hed_assert_intern(factory);
 	hed_assert_intern(rpc);
 	hed_assert_intern(meth);
-	
+
 	const struct hed_rpc_factory * auth_factory;
 	galv_rpc_fn * * fn;
 	bool permit = false;
@@ -30,7 +30,7 @@ hed_rpc_create(const struct galv_rpc_factory * __restrict factory,
 		hed_assert_intern(i < nr);
 
 		const struct hed_rpc_auth *auth = &auth_factory->auth[i];
-	
+
 		fn[auth->id] = auth->meth;
 		permit = true;
 	}

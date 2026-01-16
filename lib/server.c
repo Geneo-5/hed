@@ -12,7 +12,7 @@
 #include <utils/signal.h>
 #include <utils/timer.h>
 
-static int
+static int __hed_nonull(1, 3)
 hed_srv_dispatch_sigchan(struct upoll_worker * work,
                          uint32_t              state __unused,
                          const struct upoll *  poll __unused)
@@ -107,7 +107,7 @@ hed_srv_close_sigchan(struct hed_server *srv)
 }
 
 
-int __hed_nonull(1, 2, 3)
+int
 hed_srv_init(struct hed_server                 *srv,
              char                              *path,
              const struct galv_rpc_accept_conf *conf,
@@ -123,7 +123,7 @@ hed_srv_init(struct hed_server                 *srv,
 	galv_unix_adopt_config(&unix_conf, SOCK_STREAM, SOCK_CLOEXEC,
 	                       path, CONFIG_HED_CONN_NR);
 	galv_repo_init(&srv->repo, CONFIG_HED_CONN_NR);
- 
+
 	ret = galv_unix_adopt_open(&srv->adopt, GALV_GATE_DUMMY, &unix_conf);
 	if (ret)
 		goto fini;
@@ -144,7 +144,7 @@ hed_srv_init(struct hed_server                 *srv,
 	ret = hed_srv_open_sigchan(srv);
 	if (!ret)
 		return 0;
-	
+
 	hed_srv_close_sigchan(srv);
 close_poll:
 	upoll_close(&srv->poll);
@@ -155,7 +155,7 @@ fini:
 	return ret;
 }
 
-int __hed_nonull(1)
+int
 hed_srv_process(struct hed_server *srv)
 {
 	hed_assert_api(srv);
@@ -177,7 +177,7 @@ hed_srv_process(struct hed_server *srv)
 	return upoll_dispatch(&srv->poll, (unsigned int)ret);
 }
 
-int __hed_nonull(1)
+int
 hed_srv_run(struct hed_server *srv)
 {
 	hed_assert_api(srv);
@@ -197,7 +197,7 @@ hed_srv_run(struct hed_server *srv)
 	return ret;
 }
 
-int __hed_nonull(1)
+int
 hed_srv_halt(struct hed_server *srv)
 {
 	hed_assert_api(srv);
@@ -223,7 +223,7 @@ hed_srv_halt(struct hed_server *srv)
 }
 
 
-void __hed_nonull(1)
+void
 hed_srv_fini(struct hed_server *srv)
 {
 	hed_assert_api(srv);
