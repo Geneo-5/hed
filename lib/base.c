@@ -30,3 +30,153 @@ hed_chk_name(const struct stroll_lvstr * value)
 }
 
 
+
+
+
+
+
+struct hed_bauds_bisect_entry {
+	const char * str;
+	enum hed_bauds value;
+};
+
+static const struct hed_bauds_bisect_entry hed_bauds_bisect_array[] = {
+	{"Bd_115200", HED_BD_115200},
+	{"Bd_19200", HED_BD_19200},
+	{"Bd_38400", HED_BD_38400},
+	{"Bd_57600", HED_BD_57600},
+	{"Bd_9600", HED_BD_9600},
+};
+
+const char *
+hed_bauds_to_str(enum hed_bauds value)
+{
+	unsigned long i;
+
+	for (i = 0; i < stroll_array_nr(hed_bauds_bisect_array); i++) {
+		if (hed_bauds_bisect_array[i].value == value)
+			return hed_bauds_bisect_array[i].str;
+	}
+	return NULL;
+}
+
+static int
+hed_bauds_bisect_cmp(const void * __restrict key,
+		  const void * __restrict entry,
+		  void *                  data __unused)
+{
+	hed_assert(key);
+	hed_assert(entry);
+
+	const char * k = key;
+	const char * e = ((const struct hed_bauds_bisect_entry *)entry)->str;
+	return strcmp(k, e);
+}
+
+int
+hed_bauds_from_str(const char *str, enum hed_bauds *value)
+{
+	hed_assert(str);
+	hed_assert(value);
+
+	const struct hed_bauds_bisect_entry *entry;
+
+	entry = stroll_array_bisect_search(str,
+					   hed_bauds_bisect_array,
+					   stroll_array_nr(hed_bauds_bisect_array),
+					   sizeof(hed_bauds_bisect_array[0]),
+					   hed_bauds_bisect_cmp,
+					   NULL);
+	if (!entry)
+		return -EINVAL;
+
+	*value = entry->value;
+	return 0;
+}
+
+int
+hed_bauds_dump_str(const char ** buf, size_t nr __unused)
+{
+	hed_assert(buf);
+	hed_assert(nr >= HED_BAUDS_NB);
+
+	unsigned long i;
+
+	for (i = 0; i < stroll_array_nr(hed_bauds_bisect_array); i++) {
+		buf[i] = hed_bauds_bisect_array[i].str;
+	}
+	return HED_BAUDS_NB;
+}
+
+
+
+struct hed_toggle_bisect_entry {
+	const char * str;
+	enum hed_toggle value;
+};
+
+static const struct hed_toggle_bisect_entry hed_toggle_bisect_array[] = {
+	{"disable", HED_DISABLE},
+	{"enable", HED_ENABLE},
+};
+
+const char *
+hed_toggle_to_str(enum hed_toggle value)
+{
+	unsigned long i;
+
+	for (i = 0; i < stroll_array_nr(hed_toggle_bisect_array); i++) {
+		if (hed_toggle_bisect_array[i].value == value)
+			return hed_toggle_bisect_array[i].str;
+	}
+	return NULL;
+}
+
+static int
+hed_toggle_bisect_cmp(const void * __restrict key,
+		  const void * __restrict entry,
+		  void *                  data __unused)
+{
+	hed_assert(key);
+	hed_assert(entry);
+
+	const char * k = key;
+	const char * e = ((const struct hed_toggle_bisect_entry *)entry)->str;
+	return strcmp(k, e);
+}
+
+int
+hed_toggle_from_str(const char *str, enum hed_toggle *value)
+{
+	hed_assert(str);
+	hed_assert(value);
+
+	const struct hed_toggle_bisect_entry *entry;
+
+	entry = stroll_array_bisect_search(str,
+					   hed_toggle_bisect_array,
+					   stroll_array_nr(hed_toggle_bisect_array),
+					   sizeof(hed_toggle_bisect_array[0]),
+					   hed_toggle_bisect_cmp,
+					   NULL);
+	if (!entry)
+		return -EINVAL;
+
+	*value = entry->value;
+	return 0;
+}
+
+int
+hed_toggle_dump_str(const char ** buf, size_t nr __unused)
+{
+	hed_assert(buf);
+	hed_assert(nr >= HED_TOGGLE_NB);
+
+	unsigned long i;
+
+	for (i = 0; i < stroll_array_nr(hed_toggle_bisect_array); i++) {
+		buf[i] = hed_toggle_bisect_array[i].str;
+	}
+	return HED_TOGGLE_NB;
+}
+

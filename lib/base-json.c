@@ -77,3 +77,104 @@ error:
 	return ret;
 };
 
+
+
+
+
+
+
+struct json_object *
+hed_dec_bauds_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	enum hed_bauds value;
+	const char *str;
+
+	ret = dpack_decode_int(decoder, (int *)&value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	str = hed_bauds_to_str(value);
+	if (!str) {
+		errno = EINVAL;
+		return NULL;
+	}
+	return json_object_new_string(str);
+};
+
+int
+hed_enc_bauds_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	const char * str;
+	enum hed_bauds value;
+
+	errno = 0;
+	str = json_object_get_string(object);
+	if (errno)
+		return -errno;
+
+	ret = hed_bauds_from_str(str, &value);
+	if (ret)
+		return ret;
+
+	return dpack_encode_int(encoder, (int)value);
+};
+
+
+
+
+struct json_object *
+hed_dec_toggle_to_json(struct dpack_decoder * decoder)
+{
+	hed_assert(decoder);
+
+	int ret;
+	enum hed_toggle value;
+	const char *str;
+
+	ret = dpack_decode_int(decoder, (int *)&value);
+	if (ret) {
+		errno = -ret;
+		return NULL;
+	}
+
+	str = hed_toggle_to_str(value);
+	if (!str) {
+		errno = EINVAL;
+		return NULL;
+	}
+	return json_object_new_string(str);
+};
+
+int
+hed_enc_toggle_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+{
+	hed_assert(encoder);
+	hed_assert(object);
+
+	int ret;
+	const char * str;
+	enum hed_toggle value;
+
+	errno = 0;
+	str = json_object_get_string(object);
+	if (errno)
+		return -errno;
+
+	ret = hed_toggle_from_str(str, &value);
+	if (ret)
+		return ret;
+
+	return dpack_encode_int(encoder, (int)value);
+};
+
