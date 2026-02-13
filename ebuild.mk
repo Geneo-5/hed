@@ -11,6 +11,7 @@ config-obj      := config.o
 HEADERDIR       := $(CURDIR)/include
 headers         := hed/cdefs.h
 headers         += hed/rpc.h
+headers         += hed/rpc_clnt.h
 headers         += hed/server.h
 headers         += hed/repo.h
 headers         += $(call kconf_enabled,HED_TROER_BASE,hed/base.h)
