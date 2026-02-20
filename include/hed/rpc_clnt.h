@@ -5,8 +5,16 @@
 
 struct hed_rpc_clnt_msg {
 	struct galv_rpc_clnt_msg base;
-	void *                   cb;
-	void *                   ctx;
+	union {
+		struct {
+			void *     cb;
+			void *     ctx;
+		} async;
+		struct {
+			uint32_t * status;
+			void *     response;
+		} sync;
+	} u;
 };
 
 static inline int
