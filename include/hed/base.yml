@@ -18,19 +18,19 @@ declarations:
     type: enum
     entries:
       -
-        name: Bd_9600
+        name: 9600
         value: 9600
       -
-        name: Bd_19200
+        name: 19200
         value: 19200
       -
-        name: Bd_38400
+        name: 38400
         value: 38400
       -
-        name: Bd_57600
+        name: 57600
         value: 57600
       -
-        name: Bd_115200
+        name: 115200
         value: 115200
   -
     name: toggle
