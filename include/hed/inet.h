@@ -1187,7 +1187,7 @@ __hed_nonull(1, 2) __nothrow __warn_result ;
 #define HED_IN_SVC_PACKED_SIZE_MIN \
 	(HED_IN_ADDR_PACKED_SIZE_MIN + \
 	 HED_PORT_PACKED_SIZE_MIN)
-	
+
 /**
  * Maximum size in bytes of an struct hed_in_svc serialized according to
  * the @rstsubst{MessagePack int format}.
@@ -1390,7 +1390,7 @@ hed_in_svc_set_port(struct hed_in_svc * data, uint16_t value)
 #define HED_IN6_SVC_PACKED_SIZE_MIN \
 	(HED_IN6_ADDR_PACKED_SIZE_MIN + \
 	 HED_PORT_PACKED_SIZE_MIN)
-	
+
 /**
  * Maximum size in bytes of an struct hed_in6_svc serialized according to
  * the @rstsubst{MessagePack int format}.
@@ -1593,7 +1593,7 @@ hed_in6_svc_set_port(struct hed_in6_svc * data, uint16_t value)
 #define HED_IN_NET_PACKED_SIZE_MIN \
 	(HED_IN_ADDR_PACKED_SIZE_MIN + \
 	 HED_IN_PFX_PACKED_SIZE_MIN)
-	
+
 /**
  * Maximum size in bytes of an struct hed_in_net serialized according to
  * the @rstsubst{MessagePack int format}.
@@ -1809,7 +1809,7 @@ hed_in_net_set_prefix(struct hed_in_net * data, uint8_t value)
 #define HED_IN6_NET_PACKED_SIZE_MIN \
 	(HED_IN6_ADDR_PACKED_SIZE_MIN + \
 	 HED_IN6_PFX_PACKED_SIZE_MIN)
-	
+
 /**
  * Maximum size in bytes of an struct hed_in6_net serialized according to
  * the @rstsubst{MessagePack int format}.
