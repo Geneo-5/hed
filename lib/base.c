@@ -41,11 +41,11 @@ struct hed_bauds_bisect_entry {
 };
 
 static const struct hed_bauds_bisect_entry hed_bauds_bisect_array[] = {
-	{"115200", HED_115200},
-	{"19200", HED_19200},
-	{"38400", HED_38400},
-	{"57600", HED_57600},
-	{"9600", HED_9600},
+	{"115200", HED_B115200},
+	{"19200", HED_B19200},
+	{"38400", HED_B38400},
+	{"57600", HED_B57600},
+	{"9600", HED_B9600},
 };
 
 const char *

@@ -261,11 +261,11 @@ hed_fini_name(struct stroll_lvstr * value)
  * 
  **/
 enum hed_bauds {
-		HED_9600 = 9600,
-		HED_19200 = 19200,
-		HED_38400 = 38400,
-		HED_57600 = 57600,
-		HED_115200 = 115200,
+		HED_B9600 = 9600,
+		HED_B19200 = 19200,
+		HED_B38400 = 38400,
+		HED_B57600 = 57600,
+		HED_B115200 = 115200,
 };
 
 /**

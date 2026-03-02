@@ -18,20 +18,25 @@ declarations:
     type: enum
     entries:
       -
-        name: 9600
+        name: b9600
         value: 9600
+        string: "9600"
       -
-        name: 19200
+        name: b19200
         value: 19200
+        string: "19200"
       -
-        name: 38400
+        name: b38400
         value: 38400
+        string: "38400"
       -
-        name: 57600
+        name: b57600
         value: 57600
+        string: "57600"
       -
-        name: 115200
+        name: b115200
         value: 115200
+        string: "115200"
   -
     name: toggle
     type: enum
