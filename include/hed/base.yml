@@ -47,5 +47,23 @@ declarations:
       -
         name: enable
         value: 1
+  -
+    name: power
+    type: enum
+    entries:
+      -
+        name: "on"
+        value: 1
+      -
+        name: "off"
+        value: 0
+  -
+    name: link_state
+    type: enum
+    entries:
+      - down
+      - up
+      - detected
+
 
 
