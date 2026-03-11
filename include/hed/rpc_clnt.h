@@ -7,12 +7,12 @@ struct hed_rpc_clnt_msg {
 	struct galv_rpc_clnt_msg base;
 	union {
 		struct {
-			void *     cb;
-			void *     ctx;
+			void * cb;
+			void * ctx;
 		} async;
 		struct {
-			uint32_t * status;
-			void *     response;
+			int  * status;
+			void * response;
 		} sync;
 	} u;
 };
