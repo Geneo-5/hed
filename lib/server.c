@@ -156,6 +156,51 @@ fini:
 }
 
 int
+hed_srv_conn_init(struct hed_server                 *srv,
+                  int                                fd,
+                  const struct galv_rpc_accept_conf *conf,
+                  const struct hed_rpc_factory      *factory)
+{
+	hed_assert_api(srv);
+	hed_assert_api(conf);
+
+	int ret;
+
+	galv_repo_init(&srv->repo, CONFIG_HED_CONN_NR);
+
+	ret = galv_fd_adopt_open(&srv->adopt,
+	                         GALV_GATE_DUMMY, fd);
+	if (ret)
+		goto fini;
+
+	ret = upoll_open(&srv->poll, CONFIG_HED_CONN_NR + 1);
+	if (ret)
+		goto close_adopt;
+
+	ret = galv_rpc_open_accept(&srv->accept,
+	                           &factory->base,
+	                           &srv->repo,
+	                           (struct galv_adopt *)&srv->adopt,
+	                           &srv->poll,
+	                           conf);
+	if (ret)
+		goto close_poll;
+
+	ret = hed_srv_open_sigchan(srv);
+	if (!ret)
+		return 0;
+
+	hed_srv_close_sigchan(srv);
+close_poll:
+	upoll_close(&srv->poll);
+close_adopt:
+	galv_unix_adopt_close(&srv->adopt);
+fini:
+	galv_repo_fini(&srv->repo);
+	return ret;
+}
+
+int
 hed_srv_process(struct hed_server *srv)
 {
 	hed_assert_api(srv);
