@@ -110,6 +110,7 @@ hed_srv_close_sigchan(struct hed_server *srv)
 int
 hed_srv_init(struct hed_server                 *srv,
              char                              *path,
+             mode_t                             mode,
              const struct galv_rpc_accept_conf *conf,
              const struct hed_rpc_factory      *factory)
 {
@@ -140,6 +141,11 @@ hed_srv_init(struct hed_server                 *srv,
 	                           conf);
 	if (ret)
 		goto close_poll;
+
+	if (chmod(path, mode)) {
+		ret = -errno;
+		goto close_poll;
+	}
 
 	ret = hed_srv_open_sigchan(srv);
 	if (!ret)

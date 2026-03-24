@@ -24,9 +24,10 @@ struct hed_server {
 extern int
 hed_srv_init(struct hed_server                 *srv,
              char                              *path,
+             mode_t                             mode,
              const struct galv_rpc_accept_conf *conf,
              const struct hed_rpc_factory      *factory)
-	__hed_nonull(1, 2, 3, 4);
+	__hed_nonull(1, 2, 4, 5);
 
 extern int
 hed_srv_conn_init(struct hed_server                 *srv,
