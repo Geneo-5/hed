@@ -7,7 +7,7 @@
 include ../common.mk
 
 libhed-objects  := rpc.o server.o repo.o
-libhed-objects  += $(call kconf_enabled,HED_TROER_BASE,base.o base-json.o)
+libhed-objects  += $(call kconf_enabled,HED_TROER_BASE,base.o base-json.o base-impl.o)
 libhed-objects  += $(call kconf_enabled,HED_TROER_INET,inet.o inet-json.o inet-impl.o)
 
 solibs             := libhed.so

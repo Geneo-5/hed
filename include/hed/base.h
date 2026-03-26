@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stroll/array.h>
 #include <stroll/cdefs.h>
+#include <time.h>
 
 /**
  * Assert if condition is not
@@ -1121,5 +1122,149 @@ hed_enc_link_state_from_json(struct dpack_encoder * encoder,
 		    struct json_object * object)
 __hed_nonull(1, 2) __nothrow __warn_result ;
 
+
+/**
+ * Minimum size in bytes of an struct timespec serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_TIME_PACKED_SIZE_MIN (DPACK_BIN_SIZE(sizeof(struct timespec)))
+	
+/**
+ * Maximum size in bytes of an struct timespec serialized according to
+ * the @rstsubst{MessagePack int format}.
+ */
+#define HED_TIME_PACKED_SIZE_MAX (DPACK_BIN_SIZE(sizeof(struct timespec)))
+
+/**
+ * Check if input is valid struct timespec
+ *
+ * @param[in] value The value to test
+ *
+ * @return an errno like error code
+ * @retval 0       Success
+ * @retval -EINVAL Invalid value
+ */
+extern int
+hed_check_time(const struct timespec * value)
+__hed_nonull(1) __warn_result ;
+
+/**
+ * Decode a struct timespec encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ * @param[out]   value   location where to store decoded value
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_BASE_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ * - ()
+ */
+extern int
+hed_decode_time(struct dpack_decoder * decoder,
+	  struct timespec * __restrict value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Encode an struct timespec according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    value  hed_time value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_BASE_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ * - @p value *MUST* have been initialized using ()
+ *   before calling this function. Result is undefined otherwise.
+ *
+ * @see
+ * - dpack_encode_int8()
+ * - dpack_encoder_init_buffer()
+ * - ()
+ */
+extern int
+hed_encode_time(struct dpack_encoder * encoder,
+	  const struct timespec * value)
+__hed_nonull(1, 2) __nothrow __warn_result ;
+
+/**
+ * Decode a struct timespec encoded according to the MessagePack format
+ *
+ * @param[inout] decoder decoder
+ *
+ * @return an json-c object or NULL if error
+ * @retval NULL      Error setted in errno.
+ * @retval -EPROTO   Not a valid MessagePack stream
+ * @retval -ENOTSUP  Unsupported MessagePack stream data
+ * @retval -ENOMSG   Invalid MessagePack stream data type or range
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ *
+ * @warning
+ * - @p decoder *MUST* have been initialized using dpack_decoder_init_buffer()
+ *   or dpack_decoder_init_skip_buffer() before calling this function. Result is
+ *   undefined otherwise.
+ * - When compiled with the #CONFIG_BASE_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_decoder_init_buffer()
+ * - dpack_decoder_init_skip_buffer()
+ */
+struct json_object *
+hed_decode_time_to_json(struct dpack_decoder * decoder)
+__hed_nonull(1) __nothrow __warn_result ;
+
+/**
+ * Encode an json struct timespec according to the MessagePack format
+ * @param[inout] encoder encoder
+ * @param[in]    object json-object value to encode
+ *
+ * @return an errno like error code
+ * @retval 0         Success
+ * @retval -EMSGSIZE Not enough space to complete operation
+ * @retval -ENOMEM   Memory allocation failure
+ * @retval -EINVAL   Invalid value
+ *
+ * @warning
+ * - @p encoder *MUST* have been initialized using dpack_encoder_init_buffer()
+ *   before calling this function. Result is undefined otherwise.
+ * - When compiled with the #CONFIG_BASE_ASSERT build option
+ *   disabled and @p decoder is in error state before calling this function,
+ *   result is undefined. An assertion is triggered otherwise.
+ *
+ * @see
+ * - dpack_encode_()
+ * - dpack_encoder_init_buffer()
+ */
+extern int
+hed_encode_time_from_json(struct dpack_encoder * encoder,
+		    struct json_object * object)
+__hed_nonull(1, 2) __nothrow __warn_result ;
 
 #endif /* _HED_BASE_H */

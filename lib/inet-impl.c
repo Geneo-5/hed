@@ -27,6 +27,7 @@ hed_encode_ether_addr(struct dpack_encoder    * encoder,
 {
 	hed_assert_api(encoder);
 	hed_assert_api(addr);
+	hed_assert_api(!hed_check_ether_addr(addr));
 
 	return dpack_encode_bin(encoder,
 	                        (const uint8_t *)addr->ether_addr_octet,
@@ -48,7 +49,7 @@ hed_decode_ether_addr(struct dpack_decoder * decoder,
 	if (ret < 0)
 		return ret;
 
-	return ret == ETH_ALEN ? 0 : -EINVAL;
+	return ret == ETH_ALEN ? hed_check_ether_addr(addr) : -EINVAL;
 }
 
 int
@@ -68,12 +69,12 @@ hed_encode_ether_addr_from_json(struct dpack_encoder * encoder,
 	asc = json_object_get_string(obj);
 	hed_assert_api(asc);
 
+	if (!ether_aton_r(asc, &addr))
+		return -EINVAL;
+
 	ret = hed_check_ether_addr(&addr);
 	if (ret)
 		return ret;
-
-	if (!ether_aton_r(asc, &addr))
-		return -EINVAL;
 
 	return hed_encode_ether_addr(encoder, &addr);
 }

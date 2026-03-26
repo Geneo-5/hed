@@ -64,6 +64,15 @@ declarations:
       - down
       - up
       - detected
-
+  -
+    name: time
+    type: custom
+    header: <time.h>
+    struct: struct timespec
+    min: DPACK_BIN_SIZE(sizeof(struct timespec))
+    max: DPACK_BIN_SIZE(sizeof(struct timespec))
+    encode: hed_encode_time
+    decode: hed_decode_time
+    check: hed_check_time
 
 
